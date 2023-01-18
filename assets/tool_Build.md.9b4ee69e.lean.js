@@ -1,1 +1,0 @@
-import{_ as e,c as o,o as t,a as c}from"./app.ce5a6efd.js";const f=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"tool/Build.md"}'),d={name:"tool/Build.md"},s=c("",7),r=[s];function a(p,_,n,i,l,h){return t(),o("div",null,r)}const u=e(d,[["render",a]]);export{f as __pageData,u as default};
