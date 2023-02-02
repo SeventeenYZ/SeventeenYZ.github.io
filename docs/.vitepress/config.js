@@ -9,10 +9,10 @@ export default {
       {
         text: '基础',
         items: [
-          { text: '知识体系', link: '/basis/System'},
-          { text: 'HTML', link: '/basis/HTML'},
-          { text: 'CSS', link: '/basis/CSS'},
-          { text: 'JavaScript', link: '/basis/JavaScript'},
+          { text: '知识体系', link: '/Base/System'},
+          { text: 'HTML', link: '/Base/HTML'},
+          { text: 'CSS', link: '/Base/CSS'},
+          { text: 'JavaScript', link: '/Base/JavaScript'},
         ]
       },
       {
@@ -34,9 +34,9 @@ export default {
       {
         text: '专题',
         items: [
-          { text: '网络', link: '/topic/http' },
-          { text: '规范', link: '/topic/style'},
-          { text: '构建', link: '/topic/build'}
+          { text: '网络', link: '/Topic/http' },
+          { text: '规范', link: '/Topic/style'},
+          { text: '构建', link: '/Topic/build'}
         ]
       },
       {
