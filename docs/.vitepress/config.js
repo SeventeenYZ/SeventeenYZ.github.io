@@ -16,19 +16,20 @@ export default {
         ]
       },
       {
+        text: '架构学习',
+        items: [
+          { text: 'FSD', link: '/Architecture/FSD' },
+          { text: 'Clean Architecture', link: '/Architecture/Clean Architecture' },
+        ]
+      },
+      {
         text: '框架',
         items: [
           { text: 'Vue', link: '/Framework/Vue' },
           { text: 'React', link: '/Framework/React' },
           { text: '路由', link: '/Framework/Router' },
           { text: '状态管理库', link: '/Framework/Store' },
-        ]
-      },
-      {
-        text: '架构学习',
-        items: [
-          { text: 'FSD', link: '/Architecture/FSD' },
-          { text: 'Clean Architecture', link: '/Architecture/Clean Architecture' },
+          { text: '应用类型', link: '/Framework/type' },
         ]
       },
       {
@@ -40,25 +41,21 @@ export default {
         ]
       },
       {
-        text: 'Vue相关',
-        items: [
-          { text: 'Nuxt', link: '/Vue/Nuxt' },
-        ]
-      },
-      {
         text: '工具库使用记录',
         items: [
           { text: 'Element UI', link: '/Library/ElementUI' },
           { text: 'Ant Design', link: '/Library/Ant Design' },
           { text: 'Ant Design Mobile', link: '/Library/Ant Design Mobile' },
+          { text: 'Git', link: '/Library/Git' },
+          { text: 'TypeScript', link: '/Library/TypeScript' },
         ]
       },
       {
-        text: '工具',
+        text: '杂项',
         items: [
-          { text: 'Git', link: '/Tool/Git' },
           { text: '踩坑记录', link: '/Tool/Bug' },
           { text: '技巧', link: '/Tool/tip'},
+          { text: '登录', link: '/Tool/login'},
         ]
       },
       {
