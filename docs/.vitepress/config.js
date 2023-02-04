@@ -35,7 +35,7 @@ export default {
       {
         text: '专题',
         items: [
-          { text: '网络', link: '/Topic/http' },
+          { text: '网络', link: '/Topic/network' },
           { text: '规范', link: '/Topic/style'},
           { text: '构建', link: '/Topic/build'}
         ]
