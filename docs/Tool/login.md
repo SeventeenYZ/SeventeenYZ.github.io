@@ -26,3 +26,9 @@
 不存在则说明客户空闲过久，信息失效需要重新登录。存在则验证是否过期，过期会重新续签`token`
 
 例如`access token`有效期12小时，`refresh token`有效期24小时，用户如果在超过12小时但是不到24小时的时间内请求服务器则会续签`token`，超过24小时就需要重新登录
+
+### 有了token为什么还要cookie
+
+例如token是在axios请求拦截里添加请求头Authorization：{token}，当通过location.href ='文件地址'下载文件，默认发起一个get请求，但是不会经过axios请求拦截器（该请求也会自动带上cookie），因此无法添加token，需要cookie以便能实现认证下载，类似的还有通过a标签下载
+
+不用cookie解决办法：不用cookie会比较麻烦，如果要用ajax去接收，类型改成blob，然后去下载这个资源或者后端配合，从header中获取不到就从query string(params)获取前端url带上token参数 download?token={token}

@@ -1,6 +1,8 @@
 ## Table
 
-table的column配置，可以只设置key或只设置dataIndex，（都设置的话会以dataIndex为主）
+### table的column配置
+
+可以只设置key或只设置dataIndex，（都设置的话会以dataIndex为主）
 
 有render的话两者都可，没有render的话要有dataIndex
 
@@ -28,7 +30,69 @@ table的column配置，可以只设置key或只设置dataIndex，（都设置的
         },
 ```
 
+### 树状表格
 
+expandable里设置childrenColumnName，但不能指定子表格的rowKey
+对于父子表格key不同的用不了，如父表格rowKey是县id，子表格rowKey是镇id
+解决办法，expandedRowRender自定义渲染
+
+展开子表格时最下方出现滚动条原因：设置子表格左和上两个边距，使其对齐父表格左上角后，再设置子表格的右边距，让子表格能获得的最终宽度和父表格除第一列（展开收缩按钮列）外其余列之和相同，这样表格内部自适应分配宽度后，子表格和父表格刚好能够对齐并且没有滚动条
+
+```tsx
+<Table
+  columns={columns}
+  dataSource={tableData}
+  bordered
+  rowKey='county_id'
+  scroll={{ x: '1000' }}
+  expandable={{
+  //  childrenColumnName: 'townList' // pass,通过townList数组来渲染，但不能指定rowKey为town_id
+      expandedRowRender,
+      rowExpandable: (record) => record.townList && record.townList.length
+  }}
+  pagination={{
+                      showSizeChanger: false,
+                      total: total,
+                      current: pageIndex,
+                      pageSize: PAGE_SIZE,
+                      onChange: async (currentPageIndex: number) =>
+                        Promise.resolve(getTableList(currentPageIndex))
+    }} />
+ const expandedRowRender = (record) => {
+        const columns = [
+            {
+                title: '镇名',
+                dataIndex: 'town_name',
+                key: 'town_name',
+                width: 200
+            },
+        	... // 父表格有定义width的项都要定义width，为了对齐父表格
+            {
+                title: '上交时间',
+                key: 'created_on',
+                dataIndex: 'created_on' 
+            }
+        ]
+
+        return (
+          <Table
+            className={styles['expand-table-box']}
+            showHeader={false}
+            columns={columns}
+            rowKey='project_id'
+            dataSource={record.projects}
+            pagination={false}
+          />
+        )
+    }
+ 
+ const columns = [...] // 父表格的columns定义，格式与子表格一样
+ // index.less
+.expand-table-box {
+	padding: 0 10px 0 8px; // 为了让子表格对齐父表格
+    margin-top: 10px;                  
+}
+```
 
 ## 三层多选框
 
