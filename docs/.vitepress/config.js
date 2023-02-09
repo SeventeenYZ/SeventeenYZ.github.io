@@ -56,6 +56,9 @@ export default {
           { text: '踩坑记录', link: '/Tool/Bug' },
           { text: '技巧', link: '/Tool/tip'},
           { text: '登录', link: '/Tool/login'},
+          { text: '浏览器', link: '/Tool/browser'},
+          { text: '后端概念', link: '/Tool/backend'},
+          { text: '部署流程', link: '/Tool/deploy'},
         ]
       },
       {

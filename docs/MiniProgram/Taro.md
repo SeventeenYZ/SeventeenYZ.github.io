@@ -1,3 +1,18 @@
+## PC端小程序的windowHeight问题
+
+背景：页面是由自定义导航栏、头部筛选框、无限滚动组件、脚部合计框、Taro内置tabbar组成，
+
+问题：Taro.getSystemInfoSync()返回的screenHeight和windowHeight在移动端是有区别的，screenHeight指的是屏幕整体高度，windowHeight是可以写标签的盒子高度，screenHeight - windowHeight = tarbar高度（如果导航栏不是自定义应该还要减去导航栏的高度），问题出在PC端打开小程序时，screenHeight和windowHeight是一样的，而无限滚动组件的高度是由以下公式计算
+
+```ts
+// 屏幕375px时，1rpx = 0.5px，屏幕75opx时，1rpx = 1px
+const pxMultiple = Taro.getSystemInfoSync().windowWidth / 750
+export const infiniteScrollHeight = Taro.getSystemInfoSync() - navHeight - statusHeight - pxMultiple * 228
+// navHeight是导航栏高度，statusHeight是导航栏上面的高度，228是头部和脚部高度之和
+// vh、vw在android4.4、ios8以上版本支持
+export const infiniteScrollHeight = `calc(100vh - ${navHeight}px - ${statusHeight} - ${pxMultiple * 228}px)`
+```
+
 ## 去某个页面，返回时保留已勾选数据
 
 ```tsx

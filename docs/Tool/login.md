@@ -15,7 +15,7 @@
 
 ## token登录
 
-`token`是服务端生成的一串字符串当成客户端请求的一个标识，首次登录后，服务端生成一个`token`返回给客户端，客户端自行保存，后续访问带上这个`token`来让服务器验证身份
+`token`是服务端生成的一串字符串当成客户端请求的一个标识，首次登录后，服务端生成一个`token`返回给客户端，客户端自行保存，后续访问带上这个`token`来让服务器验证身份，用解析`token`的计算时间换取`session`的存储空间
 
 ## token续签
 
@@ -32,3 +32,17 @@
 例如token是在axios请求拦截里添加请求头Authorization：{token}，当通过location.href ='文件地址'下载文件，默认发起一个get请求，但是不会经过axios请求拦截器（该请求也会自动带上cookie），因此无法添加token，需要cookie以便能实现认证下载，类似的还有通过a标签下载
 
 不用cookie解决办法：不用cookie会比较麻烦，如果要用ajax去接收，类型改成blob，然后去下载这个资源或者后端配合，从header中获取不到就从query string(params)获取前端url带上token参数 download?token={token}
+
+## JWT
+
+`JSON Web Token`（JWT）是一个`token`的具体实现方式，是目前最流行的跨域认证解决方案
+
+原理：服务器认证以后，生成一个`JSON`对象然后转变成一个字符串即`token`，返回给用户，如
+
+```json
+{
+    "姓名": "张三",
+    "角色": "普通用户",
+    "到期时间": "2023年2月11日0点0分"
+}
+```

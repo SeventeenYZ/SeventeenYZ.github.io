@@ -43,6 +43,16 @@
 
 一个意思，`Webkit rendering engine`把将元素放置在屏幕的某个位置的操作叫做`layout`，而在`Gecko rendering endgine`中叫做`Reflow`（回流）
 
+## 请求内容类型
+
+x-www-form-urlencoded格式：name=xxx&age=xxx
+
+json格式: { name: xxx, age: xxx }
+
+formData：一般传文件用
+
+x-www-form-urlencoded不需要contentType，json需要contentType: 'application/json;charset=UTF-8’，并且json可以有嵌套结构，可以支持更丰富的数据类型
+
 ## 踩坑记录
 
 ### table文字换行问题
