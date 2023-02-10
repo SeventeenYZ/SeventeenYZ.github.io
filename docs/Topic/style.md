@@ -85,6 +85,25 @@ const [activeTab, setActiveTab] = useState('会签归档')
 {activeTab === '会签终止' && ...}
 ```
 
+对于需要和后端通信的字段也不要用数字表示，在接收后转化成中文字符串，发送请求前转化成数字
+
+```ts
+export const optionsItems = [
+    {text: '普通类型', value: 0 },
+    {text: '高级类型', value: 1 },
+    {text: '特殊类型', value: 2 },
+]
+export const formatValue = (items, text) => items.find((item) => item.text === text).value;
+export const formatText = (items, value) => items.find((item) => item.value === value).text;
+const [err, data] = await getDetail({
+	type: formatValue(type),
+});
+// 方便知道定义和维护，不然改代码还要去查每个这种字段的对应的中文意思
+<div v-if="type === '普通类型'">...</div>
+```
+
+
+
 ## 函数功能纯粹
 
 ```tsx

@@ -1,3 +1,5 @@
+[学习](https://web.dev/fast/)
+
 [为什么不用prettier](https://antfu.me/posts/why-not-prettier-zh)
 
 随着前端的发展，各种提升开发效率的工具层出不穷，而浏览器只识别`html`、`css`和`js`，构建需要做的事情有以下这些
@@ -73,6 +75,8 @@ iconfont代替图片图标：将图标制作成一个字体，使用时就跟字
 css嵌套最好不要超过3层，过度嵌套会导致css文件变大，影响渲染速度
 
 事件的防抖节流
+
+去除console.log，console.log引用的数据不会被垃圾回收，传进去的对象太大容易造成内存泄漏
 
 ## 调试
 

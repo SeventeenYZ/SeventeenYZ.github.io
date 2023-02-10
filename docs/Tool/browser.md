@@ -10,15 +10,17 @@ app自带内核的好处：当初微信团队是主动找到X5内核的。原因
 
 还有人回答：在高版本的安卓系统上新版本的微信，之前看过好像也是基于WebView的（当时是看的安卓10）。x5现在只用在兼容低版本系统这个场景
 
-[内核版本检测网站](https://ie.icoa.cn/)
+自测手机系统android system webview版本是87，自带浏览器打开https://ie.icoa.cn/网站检测是89，微信浏览器打开是86，说明自带浏览器和微信都是用它们app自带的内核
 
-系统android system webview版本是87，自带浏览器打开网站监测是89，微信浏览器打开是86，说明自带浏览器和微信都是用它们app自带的内核
+还有一种检测办法，打开http://soft.imtt.qq.com/browser/tes/feedback.html，显示000000表示加载的是系统内核，显示大于0的数字表示加载了x5内核（数字是x5内核版本号）
 
 ## app自带内核和系统WebView
 
 遇到过一个问题：遇到一个跑在企微端的H5项目在Android 9手机上白屏，app版本已经是最新，排查半天是系统内置`WebView`版本过低，只有68，升级系统`WebView`后才解决
 
 原因：企微自带了x5内核，可能是默认禁用掉了app自带内核才会调用系统内置`Webview`来进行渲染加载（google play商店版本的微信默认就是使用系统`WebView`内核，这也是很多人觉得觉得 Play 商店版本的微信体验会比国内版本的微信好的原因之一）
+
+X5 WebView 内核是在APP 第一次初始化时，动态下载到APP 的内部存储空间，因为TBS SDK(Android x5 webview)采用了后台动态下发内核的方案。由于Google Play 禁止任何二进制代码的下发（包括so、dex、jar）和插件化技术的使用，故使用X5 内核的app不支持在海外Google Play上架新版本微信已经从x5内核切换到xweb内核，可以通过`Navigator.userAgent.toLowerCase().includes('xweb')换成xweb`，旧版X5内核是`includes('tbs')`
 
 组里也有人说现在企微自带的x5内核是直接在系统自带`WebView`简单封装了一下（为了减小app体积），运行的时候是调用系统`WebView`在渲染执行，所以系统`WebView`版本低会导致白屏（此条存疑）
 

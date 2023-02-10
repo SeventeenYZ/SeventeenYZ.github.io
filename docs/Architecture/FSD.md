@@ -469,7 +469,7 @@ className命名，外层的用`xxx-box`命名，里面可以是`xxx-title`，`xx
 
 ### 说明
 
-①  `store`也可像`router`一样集成进`utils`文件夹中，`some-slice.ts`放到各自页面
+①  `store`也可像`router`一样集成进`utils`文件夹中（单独一个ts文件或者store文件夹都可以），`some-slice.ts`放到各自页面
 
 ②  移动端可能按`tab`分好一些，有独立于`tab`的页面看能不能归类成和`tab`同级，否则往下一级跟实际页同级
 

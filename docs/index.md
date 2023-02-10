@@ -1,12 +1,8 @@
 ## 工程化
 
-[学习](https://web.dev/fast/)
-
-学习性能优化相关知识：影响渲染时间的因素（CDN、缓存、构建产物体积等）、调试、性能测试
+[网页性能](https://web.dev/fast/)
 
 ## 框架
-
-Vue3原理、React原理
 
 ## 网络
 
@@ -18,4 +14,4 @@ Vue3原理、React原理
 
 [前端多个库的迷你版实现](https://github.com/Sunny-117/mini-anything)
 
-探究前端各种工具的核心实现，设计模式
+探究前端各种工具的核心实现
