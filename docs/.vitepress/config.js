@@ -74,13 +74,9 @@ export default {
       {
         text: '资源',
         items: [
-          {
-            text: '基础',
-            items: [
-              { text: '现代JavaScript教程', link: 'https://zh.javascript.info' },
-              { text: '网道', link: 'https://wangdoc.com/' },
-            ]
-          },
+          { text: '现代JavaScript教程', link: 'https://zh.javascript.info' },
+          { text: '网道', link: 'https://wangdoc.com/' },
+          { text: 'w3schools', link: 'https://www.w3schools.com/' },
         ]
       }
     ],

@@ -471,10 +471,12 @@ const params = {
 
 ### 打印的对象和打印对象属性值不一致
 
+console.log为了性能，直接打印的不一定是当前值，展开的时候才会访问内存读取最新的
+
 ```js
-console.log('数据详情', this.supplier); // 展开后看到的canManQuote值是1
 console.log('数据详情id', this.supplier.canManQuote); // 值是初始值0
-// 解决办法：直接看到的是这个对象的快照
+console.log('数据详情', this.supplier); // 不展开看到的canManQuote值是0，展开后看到是1
+// 解决办法：展开查看或者debugger调试查看或JSON.stringify
 console.log('数据详情', JSON.stringify(this.supplier))
 ```
 
