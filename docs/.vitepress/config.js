@@ -37,7 +37,8 @@ export default {
         items: [
           { text: '网络', link: '/Topic/network' },
           { text: '规范', link: '/Topic/style'},
-          { text: '构建', link: '/Topic/build'}
+          { text: '构建', link: '/Topic/build'},
+          { text: '浏览器', link: '/Topic/browser'},
         ]
       },
       {
@@ -56,7 +57,6 @@ export default {
           { text: '踩坑记录', link: '/Tool/Bug' },
           { text: '技巧', link: '/Tool/tip'},
           { text: '登录', link: '/Tool/login'},
-          { text: '浏览器', link: '/Tool/browser'},
           { text: '后端概念', link: '/Tool/backend'},
           { text: '部署流程', link: '/Tool/deploy'},
         ]
