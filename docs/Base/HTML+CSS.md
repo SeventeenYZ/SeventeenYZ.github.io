@@ -1,3 +1,9 @@
+##  行内元素和float元素
+
+行内元素：无法设置宽高；内外边距只对左、右两边起作用；行内元素内无法放块元素（可通过设置`display: inline-block`来改变 ）
+
+`float`元素：浮动元素，`display`属性会变为`block`。 `float`元素和`inline-block`元素都可设置宽高和水平排列，区别在于：`float`元素会脱离文档流（除了文字内容，即文字环绕效果），而`inline-block`元素不会
+
 ## 元素隐藏的区别
 
 ```scss
@@ -438,5 +444,18 @@ let urlId = window.parent.document.getElementById('urlId').innerText;
 }
 ```
 
+### table文字换行问题
 
+使用`table`标签时，当需要显示一段很长的文字时，可能不会换行，需要在`table`标签添加以下样式属性
 
+```html
+<table style="table-layout: fixed;word-break: break-all">
+    <tr height="30pt">
+        <td colspan="2">
+              <span style="margin-left: 10pt;">{{ dataObj.orderNo }}</span>
+        </td>
+        <td colspan="4">
+            <span style="margin-left: 10pt;">{{ dataObj.phone }}</span>
+        </td>
+    </tr>
+</table>

@@ -10,8 +10,7 @@ export default {
         text: '基础',
         items: [
           { text: '知识体系', link: '/Base/System'},
-          { text: 'HTML', link: '/Base/HTML'},
-          { text: 'CSS', link: '/Base/CSS'},
+          { text: 'HTML and CSS', link: '/Base/HTML+CSS'},
           { text: 'JavaScript', link: '/Base/JavaScript'},
         ]
       },

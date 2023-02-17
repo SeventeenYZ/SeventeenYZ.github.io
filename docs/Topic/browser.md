@@ -1,3 +1,23 @@
+## 浏览器渲染机制
+
+[chrome渲染机制](https://developer.chrome.com/blog/inside-browser-part1/)
+
+### 渲染流程
+
+1. 解析`html`文件构造`DOM`树（也叫做`content`树）
+
+2. 解析`css`文件，和`html`里的`visual instuctions`（应该指的是能展示的标签，即不包括`script`等）构造`render树`
+
+   `DOM`构造：浏览器将接收到的`HTML`代码通过`HTML`解析器解析构建成一颗`DOM`树，同时将接收到的`CSS`代码通过`CSS`解析器构建出样式表规则（`CSSOM`），然后将这些规则分别放到对应的`DOM`树节点上，得到一颗带有样式属性的`DOM`树（`render树`）
+
+3. `layout`（布局）：浏览器按从上到下，从左到右的顺序读取`DOM`树的`node`，然后开始获取`node`的坐标和大小等`css`属性，把每个`node`定位到对应的坐标
+
+4. `painting`（绘制）：遍历`render`树，用`UI backend layer`把每个`node`绘制出来
+
+### 布局和回流
+
+一个意思，`Webkit rendering engine`把将元素放置在屏幕的某个位置的操作叫做`layout`，而在`Gecko rendering endgine`中叫做`Reflow`（回流）
+
 ## 浏览器缓存
 
 ![图片加载失败](./assets/request.png)
@@ -41,6 +61,35 @@
 
 `Etag`：响应头字段，服务器对该资源的唯一标识
 `If-None-Match`：请求头字段，服务器用来与自己保存的`Etag`值作对比
+
+## 本地存储
+
+`Local Storage`：保存的数据没有过期时间，需要手动删除，存储空间5M
+
+`Session Storage`：保存的数据在页面关闭后会被删除，存储空间5M
+
+`Cookies`：过期时间自己设置，安全性不高，容易被拦截，存储空间4k
+
+相同点：都是保存在客户端，且同源共享
+
+不同点：`Cookies`数据由服务端设置，参与通信；`Session Storage`和`Local Storage`由客户端设置，不参与通信
+
+`Cookies`属性：
+① `Domain`：域，表示请求的`url`符合这个格式的请求时才会带上这个`cookie`
+② `Path`：路径前缀，符合这个路径的请求`url`才会带上
+③ `Secure`：为true时表示使用`https`协议才发送这个`cookie`
+④ `HttpOnly`：为true时表示无法通过`js`脚本读取到这个`cookie`，防止`XSS`攻击
+⑤ `Expires/Max-Age`：过期时间
+
+## 请求内容类型
+
+x-www-form-urlencoded格式：name=xxx&age=xxx
+
+json格式: { name: xxx, age: xxx }
+
+formData：一般传文件用
+
+x-www-form-urlencoded不需要contentType，json需要contentType: 'application/json;charset=UTF-8’，并且json可以有嵌套结构，可以支持更丰富的数据类型
 
 ## 内核、渲染引擎、js引擎
 
