@@ -100,3 +100,6 @@ function convertTextToValue(text: string) {
 
 ```
 
+## ios手机上z-index无效问题
+
+背景：使用的ant design mobile的popup组件，在ios16版本手机上底下部分被自定义的tabbar组件覆盖原因：因为设置了getContainer={null}，挂载到了父元素上，去掉后默认挂载到body上，z-index层级显示恢复正常

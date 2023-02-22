@@ -1,4 +1,7 @@
-export default {
+import { defineConfig } from 'vitepress'
+
+
+export default defineConfig({
   title: '灯火可亲',
   description: '前端笔记',
   themeConfig: {
@@ -79,5 +82,6 @@ export default {
         ]
       }
     ],
-  }
-}
+  },
+  markdown: { attrs: { disable: true } },
+})
