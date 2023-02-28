@@ -2,6 +2,22 @@
 
 [猴子都能懂的git入门](https://backlog.com/git-tutorial/cn/)
 
+## 基本概念
+
+`git init`：git相当于生成一个虚拟区（包含`staged environment`和`local repository`）与你的实际工作区目录（`workspace`）建立联系
+
+`git add`：表示让git追踪文件变化，变化会反映到`staged environment`
+
+`git commit`：`staged environment`将此时追踪的文件变化生成一个节点，提交到`local repository`
+
+`git push`：将`local repository`同步到`remote repository`
+
+分支模型：`HEAD`是指向当前分支节点的指针，假设从`main`分支创建`feature`分支，此时`main`和`feature`两条分支的节点是相同的，分别进行提交后才会走不同的分支路线
+
+`git merge xxx`：在当前分支上创建一个节点，合并当前分支和xxx分支的代码到此节点中
+
+`git revert`和`git reset`：
+
 ## 常见问题
 
 #### 删除远程分支

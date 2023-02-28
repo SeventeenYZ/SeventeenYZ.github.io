@@ -233,6 +233,10 @@ CPU架构：现在主流PC端架构基本都是x86，手机端都是ARM架构，
 
 2、前端的发展史
 
+3、前端知识点：https://dev.to/alexeagleson/the-complete-beginners-guide-to-a-career-in-web-development-3fbl
+
+4、前端路线图：https://roadmap.sh/frontend
+
 ## 给自己的话
 
 1、碰到一个新的工具，要以这样的思维去看待：明白它的概念，出现背景是什么，解决了什么痛点
