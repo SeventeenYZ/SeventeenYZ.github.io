@@ -412,3 +412,9 @@ position: -webkit-sticky; // 添加前缀
 需求背景：H5项目采用了AntD Mobile移动端组件库，但用户可能也会在电脑上进行操作，部分电脑可能出现某些组件无法点击的问题，需要在桌面端模拟移动端`touch`事件
 
 方法：引入touch-emulator.js
+
+## 后端一次性返回十万条数据
+
+参考资料：https://medium.com/frontend-canteen/if-the-backend-api-returns-100-000-records-at-one-time-how-should-we-handle-it-in-the-frontend-fab21218fe2
+
+补充：在几百条数据的情况下，虚拟列表与真实Dom的渲染速率毫无差别，一般所说的长列表，是几千几万条数据的情况下

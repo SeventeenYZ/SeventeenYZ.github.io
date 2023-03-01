@@ -6,6 +6,16 @@
 
 原始值直接放在容器里，引用值是一个记录着对象在堆内存中位置信息的指针
 
+![图片加载失败](./assets/stack-memory.png)
+
+![图片加载失败](./assets/heap-memory.png)
+
+null相当于分配到一个容器（内存上某个位置），只是容器里没有装任何值
+
+undefined表示压根连容器都没有
+
+参考资料：https://felixgerschau.com/javascript-memory-management/
+
 ### 类型转换
 
 ① number类型转换

@@ -74,12 +74,29 @@ export default defineConfig({
     ],
     nav: [
       {
-        text: '资源',
+        text: '前端资源',
         items: [
           { text: '现代JavaScript教程', link: 'https://zh.javascript.info' },
           { text: '网道', link: 'https://wangdoc.com/' },
           { text: 'w3schools', link: 'https://www.w3schools.com/' },
           { text: 'eloquent js', link: 'https://eloquentjavascript.net/' },
+        ]
+      },
+      {
+        text: '博客',
+        items: [
+          { text: 'joshwcomeau', link: 'https://www.joshwcomeau.com/' },
+          { text: 'felixgerschau', link: 'https://felixgerschau.com/' },
+        ]
+      },
+      {
+        text: '计算机基础',
+        items: [
+          { text: 'cs50', link: 'https://www.edx.org/cs50' },
+          { text: 'computer-science', link: 'https://github.com/ossu/computer-science' },
+          { text: 'teach yourself cs', link: 'https://teachyourselfcs.com/' },
+          { text: 'nand to tetris', link: 'https://www.nand2tetris.org/' },
+          { text: 'Building an 8-bit breadboard computer!', link: 'https://www.youtube.com/playlist?list=PLowKtXNTBypGqImE405J2565dvjafglHU' },
         ]
       }
     ],
