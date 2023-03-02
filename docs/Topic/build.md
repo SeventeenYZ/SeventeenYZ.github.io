@@ -107,6 +107,47 @@ modules.export = {
 
 缓存：文件名加入hash，有效时间内用强缓存，缓存失效用协商缓存
 
+## 图片格式
+
+webp格式通常比传统格式（jpg、png）体积小很多
+还有一种更新的图片格式：AVIF
+
+webp在IE和Safari中不支持，为了兼容性，可以写以下代码
+
+```html
+<picture>
+  <source srcset="/images/cereal-box.webp" type="image/webp" />
+  <source srcset="/images/cereal-box.jp2" type="image/jp2" />
+  <img src="/images/cereal-box.jxr" type="image/vnd.ms-photo" />
+</picture>
+```
+
+这表示在大多数浏览器中会使用webp格式，Safari中使用jp2，而IE则使用jxr
+
+还可以封装成公共组件
+
+```tsx
+const ImgWithFallback = ({
+  src,
+  fallback,
+  type = 'image/webp',
+  ...delegated
+}) => {
+  return (
+    <picture>
+      <source srcSet={src} type={type} />
+      <img src={fallback} {...delegated} />
+    </picture>
+  );
+};
+// usage
+<ImgWithFallback
+  src="/images/cereal.webp"
+  fallback="/images/cereal.png"
+  alt="A photo showing the expiration date on a box of Lucky Charms"
+/>
+```
+
 ## 工程化和工具链
 
 狭义上的工程化和工具链是指开发时有关的工具库集合，广义点的工程化和工具链概念是包含前端开发一整套流程的，从搭建开发环境，启动，开发，提交，部署，错误监控等等，流程每个节点都会存在一些问题，继而会有方案去解决，如此形成了工具链

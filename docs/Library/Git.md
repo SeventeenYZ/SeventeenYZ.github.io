@@ -16,7 +16,9 @@
 
 `git merge xxx`：在当前分支上创建一个节点，合并当前分支和xxx分支的代码到此节点中
 
-`git revert`和`git reset`：
+`git revert`和`git reset`：`git revert`是创建一个新节点，内容与指定节点相同，而`git reset`是将`HEAD`直接挪到指定节点
+
+![图片加载失败](./assets/git-branch-model.png)
 
 ## 常见问题
 

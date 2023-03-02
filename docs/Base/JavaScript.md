@@ -49,6 +49,14 @@ alert( Number(null) ); // 0
 
 函数参数是按值传递的，而不是按引用传递，传进来的值会被复制到一个局部变量中，该变量是`arguments`对象中的一个槽位，如果传递的是一个对象，那么实际传递的只是一个指向该对象所在位置的指针
 
+### 防抖与节流
+
+两者都是在某些场景下为了避免频繁请求接口
+
+防抖：n秒后再执行，若在 n 秒内被重复触发，则重新计时，通常用于在即时搜索中对input输入进行防抖处理
+
+节流：n秒内只执行一次，在n秒内重复触发，只有一次生效
+
 ## this
 
 `this`永远指向的是一个对象，这个对象就是函数执行时所处的环境（即函数上下文），设计目的就是为了指代函数执行时的函数上下文
@@ -251,7 +259,7 @@ for(let key in rabbit) alert(key); // jumps，然后是 eats
 
 `prototype`是函数特有的属性，`__proto__`是每个对象都有的属性
 
-```text
+```mermaid
 graph LR
 A(构造函数) --> |prototype| B
 B(原型对象) --> |constructor| A
@@ -273,6 +281,8 @@ const dog1 = new Dog('小金'); // dog1，dog2是实例对象，通过构造函�
 const dog2 = new Dog('小白');
 dog1.run(); // 狗会跑 // dog1没有定义run方法，它的run方法是从原型对象那继承来的
 ```
+
+实例对象虽然是构造函数创造出来的，但是它们之间并没有直接引用，实例实例之所以能用constructor属性访问到构造函数是因为这个属性是从它的原型对象继承来的
 
 ## 异步
 
@@ -547,3 +557,4 @@ function deepClone(obj, hash = new WeakMap()) {
     return cloneObj;
 }
 ```
+
