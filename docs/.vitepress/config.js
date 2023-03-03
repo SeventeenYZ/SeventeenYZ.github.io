@@ -61,6 +61,7 @@ export default defineConfig({
           { text: '登录', link: '/Tool/login'},
           { text: '后端概念', link: '/Tool/backend'},
           { text: '部署流程', link: '/Tool/deploy'},
+          { text: '数据库', link: '/Tool/SQL'},
         ]
       },
       {
@@ -98,7 +99,13 @@ export default defineConfig({
           { text: 'nand to tetris', link: 'https://www.nand2tetris.org/' },
           { text: 'Building an 8-bit breadboard computer!', link: 'https://www.youtube.com/playlist?list=PLowKtXNTBypGqImE405J2565dvjafglHU' },
         ]
-      }
+      },
+      {
+        text: '工具',
+        items: [
+          { text: '画图', link: 'https://excalidraw.com/' },
+        ]
+      },
     ],
   },
   markdown: { attrs: { disable: true } },

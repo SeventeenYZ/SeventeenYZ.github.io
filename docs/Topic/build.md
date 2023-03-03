@@ -14,19 +14,67 @@
 
 `tree shaking`：去除没用到的代码
 
+## ESLint
+
+参考资料：https://dev.to/alexeagleson/understanding-the-modern-web-stack-linters-eslint-59pm
+
+## Babel
+
+Babel有两个主要功能：将ES6+代码转换为旧版浏览器支持的ES版本，通过polyfill实现旧浏览器不支持的ES6+的api
+
+两者的不同：ES6+有分`syntax`（语法）和`functionality`（功能性api，如`Array.prototype.includes`、`Promise`），新的`syntax`可以转换成旧`syntax`（如const转var，class转function），而新的`functionality`有自己的底层实现逻辑，简单的转换语法并不能向旧浏览器解释它的底层逻辑如何运作，于是需要polyfill，它会实现运行逻辑和ES6+一样的`api`（core-js）
+
+一般安装babel
+
+```shell
+npm install @babel/core @babel/cli @babel/preset-env -D
+```
+
+以上三个基础包是Babel ecosystem的一部分
+
+`@babel/core`：通过一组指令来转换代码的主引擎
+
+`@babel/cli`：运行这个程序用于触发核心引擎并输出转换后的`js`文件
+
+`@babel/preset-env`：这是一个预设配置，告诉核心引擎要进行怎样的转换，通过查看配置（`package.json`文件的`browserslist`）来确定所需要支持的浏览器，继而确定如何进行更改
+
+还有一些预设例如用于转换`js`超集，JSX和TypeScript
+
+需要支持的浏览器版本越旧，`babel`就需要进行更多的转换工作，生成的`js`文件体积也会更大
+
+```json
+{
+  "devDependencies": {
+    "@babel/cli": "^7.15.7",
+    "@babel/core": "^7.15.5",
+    "@babel/preset-env": "^7.15.6"
+  },
+  "browserslist": ["last 2 Chrome versions"],
+  "babel": {
+    "presets": [["@babel/preset-env"]]
+  }
+}
+```
+
+参考资料：https://dev.to/alexeagleson/building-a-modern-web-stack-babel-3hfp
+
 ## Webpack
 
 打包流程
 
 1、读取配置
 
-2、启动`webpack`，创建`Compiler`对象并开始解析项目
+2l、启动`webpack`，创建`Compiler`对象并开始解析项目
 
 3、从入口文件（`entry`）开始，找到其导入的依赖模块，递归遍历分析，生成依赖关系树
 
 4、对不同文件类型的文件使用对应的`loader`编译，最终转为`JavaScript`文件
 
 5、编译过程中会通过发布订阅模式，向外抛出一些`hooks`，`webpack`的`plugin`可通过监听事件节点执行插件功能
+
+`webpack`：主要引擎，它会去了解代码和文件如何相互关联以及如何将它们打包
+
+`webpack-cli`：一个程序，运行后触发核心引擎工作，允许我们用命令行运行webpack并进行打包
 
 ## Webpack和Vite开发环境对比
 
