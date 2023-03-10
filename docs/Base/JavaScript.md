@@ -30,9 +30,11 @@ alert( Number(null) ); // 0
 
 ② boolean类型转换
 
-直观上为“空”的值（如 `0`、空字符串、`null`、`undefined` 和 `NaN`）将变为 `false`。
+直观上为“空”的值（如 `0`、空字符串、`null`、`undefined`、`void 0` 和 `NaN`）将变为 `false`。
 
 其他值变成 `true`，包括`"0"`，`"{}"`
+
+`void 0`：`value === void 0`相当于`value === undefined`，获取`undefined`值的表达式，因为`undefined`不是`JavaScript`关键字，可以被当成变量名赋值
 
 ### script
 
@@ -124,10 +126,10 @@ let bar = foo(); // 4、默认绑定，非严格模式下绑定到全局对象�
 
 ```js
 function Button() {
-	this.clicked = false;
-	this.click = () => { // Button()的this指向谁，它就跟着指向谁
-		this.clicked = true;
-	};
+    this.clicked = false;
+    this.click = () => { // Button()的this指向谁，它就跟着指向谁
+        this.clicked = true;
+    };
 }
 ```
 
@@ -181,13 +183,13 @@ fall(); // 20
 ```js
 var count = 10;
 function makeCounter() {
-	let count = 20;
-	return function() { // 当makeCounter函数被调用时，该函数就被创建出来
+    let count = 20;
+    return function() { // 当makeCounter函数被调用时，该函数就被创建出来
 // 它会生成一个内部(隐藏)的词法环境对象来存储这时它所能访问的所有变量
 // 如果之后它被调用了，那么它找变量就从词法环境对象里找
 // 就算它被调用的地方有同名变量，它还是使用的词法环境对象里的变量
         return count;
-	}
+    }
 }
 const bbq = makeCounter(); // 拿到匿名内部函数的地址
 console.log(bbq()); // 20
@@ -227,9 +229,9 @@ console.log(Boolean({})); // true
 
 ```js
 function User(name) { 
-	// this = {}; (隐式创建)
-	this.name = name;
-	// return this; (隐式返回)
+    // this = {}; (隐式创建)
+    this.name = name;
+    // return this; (隐式返回)
 }
 ```
 
@@ -272,7 +274,7 @@ C(实例对象) --> |__proto__| B
 
 ```js
 function Dog(name) {  // 构造函数
-	this.name = name;
+    this.name = name;
 }
 Dog.prototype.run = function() { // 原型对象里定义一个run方法，实例对象可以访问到
     console.log('狗会跑');
@@ -298,7 +300,7 @@ setTimeou(() => x = x + 4, 1000) // 下面的代码不知道什么时候能拿�
 
 ```js
 function double(value, callback) {
-	setTimeout(() => callback(value * 2), 1000) // 在值更新后把更新后的值当成参数传给回调函数调用
+    setTimeout(() => callback(value * 2), 1000) // 在值更新后把更新后的值当成参数传给回调函数调用
 }
 double(3, x => console.log(`value is ${x}`)) // 6
 ```
@@ -328,9 +330,9 @@ function double(value, success, failure) {
 const promise = new Promise((resolve, reject)=>{});
 // promise是这样的一个对象
 {
-	__proto__: Promise
+    __proto__: Promise
     // 在 resolve 被调用时变为 "fulfilled"，或者在 reject 被调用时变为 "rejected"。
-	[[PromiseState]]: "pending"
+    [[PromiseState]]: "pending"
     // 在 resolve(value) 被调用时变为 value，或者在 reject(error) 被调用时变为 error
     [[PromiseResult]]: undefined // 保存成功的结果或失败的错误描述对象
 }
@@ -339,9 +341,9 @@ const promise = new Promise((resolve, reject)=>{});
     then: ƒ then()
     catch: ƒ catch()
     finally: ƒ finally()
-	constructor: ƒ Promise()
-	Symbol(Symbol.toStringTag): "Promise"
-	__proto__: Object
+    constructor: ƒ Promise()
+    Symbol(Symbol.toStringTag): "Promise"
+    __proto__: Object
 }
 ```
 
@@ -445,13 +447,13 @@ try和finally都有return的话，在执行finally的return后就退出，不会
 <el-button v-loading="loading" @click="confirm">保存</el-button>
 <scirpt>
     confirm() {
-    	try {
-			this.loading = true;
-    	}.catch(e) {
-    		console.log(e);
-    	}.finally {
-    		this.loading = false;
-    	}
+        try {
+            this.loading = true;
+        }.catch(e) {
+            console.log(e);
+        }.finally {
+            this.loading = false;
+        }
     }
 </scirpt>
 ```
@@ -557,4 +559,3 @@ function deepClone(obj, hash = new WeakMap()) {
     return cloneObj;
 }
 ```
-

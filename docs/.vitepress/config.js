@@ -106,6 +106,15 @@ export default defineConfig({
           { text: '画图', link: 'https://excalidraw.com/' },
         ]
       },
+      {
+        text: 'UI相关',
+        items: [
+          { text: 'UI中国', link: 'https://www.ui.cn/' },
+          { text: '站酷', link: 'https://www.zcool.com.cn/' },
+          { text: '花瓣', link: 'https://huaban.com/' },
+          { text: '动效', link: 'https://pag.art/' }
+        ]
+      },
     ],
   },
   markdown: { attrs: { disable: true } },
