@@ -28,6 +28,8 @@ webp：支持无损压缩和有损压缩，文件体积小，支持透明背景�
 
 svg：文件体积一般比光栅图小，放大不模糊，支持动画
 
+还有一种更新的图片格式：avif，不讨论
+
 ![图片加载失败](./assets/images-format-compare.png)
 
 ## 各格式用法
@@ -42,13 +44,49 @@ gif一般不用于静态图片
 
 一般照片用jpg格式，普通插图和图标用png或svg格式
 
-jpg拥有很高的压缩比，会损失一些图像质量，适合展示color-heavy（理解为色彩丰富）的图片，例如拍摄的照片或个人照片，不适用于low-heavy（色彩少的）的例如屏幕截图，或者打印照片，或者一些带有线条、曲线、文本等元素的图片
+jpg拥有很高的压缩比，会损失一些图像质量，适合展示color-heavy（理解为色彩丰富）的图片，例如拍摄的照片或个人照片，不适用于low-heavy（色彩少的）的例如屏幕截图，也不适合打印照片，或者一些带有线条、曲线、文本等元素的图片
 
 如果比较关注图像质量而不太关注颜色，可以用png，png即使压缩后也能保持很高的质量，屏幕截图使用png更好，有时照片也会用png格式，因为png在保持图像质量方面更容易预测（Sometimes, they’re used over JPEGs for photography, since PNGs are more predictable in retaining image quality.）
 
 gif用于需要快速显示一段动画，例如简短教程的情况下，作为引入一个短视频的替代品，不适合静态图片
 
-jpg使用有损压缩来保持较小的文件大小。jpg压缩不是全有或全无的设置。可以在 0%（重度压缩）到 100%（无压缩）之间选择合适的压缩率。通常，将图像压缩到 75-100% 之间可以保持图像的完整性和高质量，压缩到 75% 时图像只有原来的一半大。大多数社交网络将其图像压缩在 70-85% 范围内，例如，Facebook 会将您的图片压缩 85%。
+jpg使用有损压缩来保持较小的文件大小。jpg压缩不是全有或全无的设置。可以在 0%（重度压缩）到 100%（无压缩）之间选择合适的压缩率。通常，将图像压缩到 75-100% 之间可以保持图像的完整性和高质量，压缩到 75% 时图像只有原来的一半大。大多数社交网络将其图像压缩在 70-85% 范围内，例如，Facebook 会将您的图片压缩 85%
+
+webp在IE和Safari中不支持，为了兼容性，可以写以下代码
+
+```html
+<picture>
+  <source srcset="/images/cereal-box.webp" type="image/webp" />
+  <source srcset="/images/cereal-box.jp2" type="image/jp2" />
+  <img src="/images/cereal-box.jxr" type="image/vnd.ms-photo" />
+</picture>
+```
+
+这表示在大多数浏览器中会使用webp格式，Safari中使用jp2，而IE则使用jxr
+
+还可以封装成公共组件
+
+```tsx
+const ImgWithFallback = ({
+  src,
+  fallback,
+  type = 'image/webp',
+  ...delegated
+}) => {
+  return (
+    <picture>
+      <source srcSet={src} type={type} />
+      <img src={fallback} {...delegated} />
+    </picture>
+  );
+};
+// usage
+<ImgWithFallback
+  src="/images/cereal.webp"
+  fallback="/images/cereal.png"
+  alt="A photo showing the expiration date on a box of Lucky Charms"
+/>
+```
 
 参考资料：https://themeisle.com/blog/best-image-format/#gref
 参考资料：https://wpmudev.com/blog/best-image-formats-png-vs-jpg-svg-gif-webp/

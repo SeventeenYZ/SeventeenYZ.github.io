@@ -40,7 +40,9 @@ React为什么不跳过纯静态组件的重渲染：我们容易高估重渲染
 ### re-render和diff的区别
 
 两者发生的时间节点不一样，先re-render后diff
+
 当state改变时，当前组件和所有子孙组件触发re-render
+
 re-render后返回的jsx即新的快照，React拿着这份新的快照去更新dom树的过程是diff
 
 ## React的重渲染
@@ -189,6 +191,8 @@ function ProductPage({ productId, referrer }) {
 }
 ```
 
+如何决定是否需要缓存计算结果：可以用`console.time`和`console.timeEnd`来判断使用`useMemo`与否的性能差，官方是推荐超过1ms时可以考虑用`useMemo`
+
 ## useContext
 
 通过`createContext`和`useContext`的配合使用，使得子孙组件可以接收某个上层组件传递的信息（不管隔多少层），类似于`Vue`的`provide`和`inject`
@@ -216,7 +220,8 @@ const ref = useRef(0) // ref.current = 0
 
 ## useEffect
 
-useEffect是为了保持与外部系统同步，例如接口数据，访问DOM等，只涉及到`state`或`prop`等，官方例子：[You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
+`useEffect`是为了保持与外部系统同步，例如接口数据，访问DOM等，只涉及到`state`或`prop`等不应该放在`useEffect`
+官方例子：[You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
 
 ## Fragment (<>...</>)
 

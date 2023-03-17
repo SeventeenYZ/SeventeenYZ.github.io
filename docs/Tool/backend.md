@@ -58,6 +58,12 @@ service：一般`Controller`接收请求后调用`Service`中的方法返回响�
 
 ![图片加载失败](./assets/guard.png)
 
+## Express and MongoDB
+
+在express中，mongodb包和mongoose包区别：mongodb包是驱动文件，用于Node.js与MongoDB数据库交互，mongoose可以看成是基于mongodb包的封装，为访问数据库提供了一些便利性
+
+SPA应用为什么接口需要加前缀baseURL：用于区别是自己维护路由跳转还是调取接口
+
 ## 后端架构演变史
 
 简单的后端程序都是打个包部署到服务器上，启动后端程序和数据库，这样就能对外提供访问了
