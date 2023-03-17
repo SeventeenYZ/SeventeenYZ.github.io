@@ -27,6 +27,7 @@ export default defineConfig({
       {
         text: '框架',
         items: [
+          { text: '框架', link: '/Framework/framework' },
           { text: 'Vue', link: '/Framework/Vue' },
           { text: 'React', link: '/Framework/React' },
           { text: '路由', link: '/Framework/Router' },
@@ -62,6 +63,7 @@ export default defineConfig({
           { text: '后端概念', link: '/Tool/backend'},
           { text: '部署流程', link: '/Tool/deploy'},
           { text: '数据库', link: '/Tool/SQL'},
+          { text: '计算机', link: '/Tool/computer'},
         ]
       },
       {

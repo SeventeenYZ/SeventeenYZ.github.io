@@ -3,9 +3,9 @@
 ```js
 window.history.go(-1); // 返回不刷新
 window.addEventListener('pageshow', function(e) {
-	if (e.persisted) { // 如果检测到页面是从"缓存"中读取的，重新加载页面
-		window.location.reload();
-	}
+    if (e.persisted) { // 如果检测到页面是从"缓存"中读取的，重新加载页面
+        window.location.reload();
+    }
 });
 ```
 
@@ -17,7 +17,7 @@ window.addEventListener('pageshow', function(e) {
 
 ```vue
 <div>
-	<div class="common-table">
+    <div class="common-table">
         <el-table...>
     </div>
     <el-pagination...>
@@ -48,4 +48,11 @@ new Date((date.replace(/-/g, '/')));
 例如筛选出错等，可能是因为绑定的`key`重复了，后端返回的列表存在重复数据
 
 检查方法：在接口响应的`Preview`里选择`expand recursively`展开列表数据，再`ctrl + F`查找出错的数据是否存在两个
+
+## webpack打包遇到的问题
+
+webpack开发环境没问题，生产环境报找不到模块
+最终排查原因：导入模块大小写不对，目录名是orgCheckList，import语句里是OrgCheckList，但IDE能正常跳转，开发环境表现正常
+开发环境window不区分大小写，生产环境linux对大小写敏感
+
 

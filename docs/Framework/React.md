@@ -37,6 +37,37 @@ function currentTime() {
 
 React为什么不跳过纯静态组件的重渲染：我们容易高估重渲染的成本，对于React来说，渲染纯静态组件是非常快且成本极小的
 
+### re-render和diff的区别
+
+两者发生的时间节点不一样，先re-render后diff
+当state改变时，当前组件和所有子孙组件触发re-render
+re-render后返回的jsx即新的快照，React拿着这份新的快照去更新dom树的过程是diff
+
+## React的重渲染
+
+`Core Loop`：`initial render` => `React Core do something` => `next render` => `React Core do something` => `next render` ...
+
+React渲染时，调用function返回的JSX就像返回一个可交互的快照（interactive snapshot），然后将快照与屏幕上的UI进行匹配，重渲染就是重新调用一次function，如此循环，渲染就是一个个基于当时`state`生成的一个快照
+
+1. React calls your function again.
+2. Your function returns a new JSX snapshot.
+3. React then updates the screen to match the snapshot you’ve returned.
+
+`state`改变，排队等候新的渲染 => `React`根据新的`state`值进行重渲染
+
+`React Core do something`：两次渲染之间`React Core`会做一些操作，例如更新`state`
+
+`state`虽然是声明在`function`中，但其实是`function`外部的`React Core`在管理，可以看成`React Core`有一个地方专门存储这些`state`
+
+一次渲染中，`state`是不会变的，`state`改变是通过`setState`函数去通知`React Core`，然后排队等候`React Core`做一些操作后进行新的渲染
+
+这也可以解释官方的一些例子
+
+1. 修改`state`后为什么不能立即获取新的`state`值的原因：因为此时还处在`initial render`的快照中，`state`还是旧的
+
+2. 为什么连续调用三次`setNumber(number + 1)`，是增加1不是增加3：此时还处在`initial render`的快照中，`number`永远都是0，相当于把`number`赋值为1这个操作重复了3次，提交给React Core的新的number值自然是1
+3. 放在`setTimeout`也获取不到新的`state`值：`setNumber(number + 5)`，紧接着`setTimeout(() => alert(number), 3000)`，不管延迟多久`alert`的永远是`initial render`里的`number`值
+
 ## useMemo and useCallback
 
 因为React的重渲染规则，出来的两个优化的hook，在重渲染时，只当依赖变化时才重新计算返回值
@@ -127,6 +158,11 @@ function ChatRoom({ roomId }) {
 }
 ```
 
+### 为什么不所有函数都用useCallback包裹
+
+`function component`中创建内部函数成本是很低的，而用了`useCallback`，每次渲染依然会创建一个新函数，只不过React会忽略它（因为依赖项没有改变）返回一个缓存过的函数，多出了计算依赖项是否改变的计算成本
+
+
 ## useMemo
 
 除了在本组件中充当类似`Vue`的`computed`的作用外，`useMemo`还可以和`useCallback`一样用来跳过子组件的重渲染，传递给子组件的时候，`useCallback`返回值是函数，`useMemo`返回值一般是数组或对象
@@ -171,6 +207,16 @@ const theme = useContext(ThemeContext)
 ```ts
 const ref = useRef(0) // ref.current = 0
 ```
+
+## useEvent
+
+保持对函数引用始终一样，包裹这个函数，无论prop或state改变都不会重新创建，而且这个函数可以访问最新的prop和state的最新值
+
+参考资料：https://blog.logrocket.com/what-you-need-know-react-useevent-hook-rfc/
+
+## useEffect
+
+useEffect是为了保持与外部系统同步，例如接口数据，访问DOM等，只涉及到`state`或`prop`等，官方例子：[You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
 
 ## Fragment (<>...</>)
 

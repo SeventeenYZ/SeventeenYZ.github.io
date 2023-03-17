@@ -488,6 +488,10 @@ const params = {
     id: detailInfo.isEdit ? detailInfo.id : undefined
 }
 ```
+## 模块化
+
+`require`是一个同步操作，它将阻止脚本的执行，直到模块被加载完成
+`import` 是一个异步操作，因此在加载模块时不会阻塞脚本
 
 ## JavaScript坑
 
