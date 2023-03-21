@@ -81,15 +81,42 @@
 ④ `HttpOnly`：为true时表示无法通过`js`脚本读取到这个`cookie`，防止`XSS`攻击
 ⑤ `Expires/Max-Age`：过期时间
 
-## 请求内容类型
+为什么有了`token`还需要`cookie`：例如通过`<a>`标签或`location.href`来下载文件，`HTTP`请求是浏览器发送的而不是`JS`，除了使用`XMLHttpRequest`和`fetch`发出的请求之外，页面无法自定义`HTTP`请求头"Authorization"来发送`token`，而用`url`发送`token`不安全，`token`暴露在`url`，会记录在浏览器历史记录、访问日志等，因此需要`cookie`
 
-x-www-form-urlencoded格式：name=xxx&age=xxx
+## 跨域
 
-json格式: { name: xxx, age: xxx }
+### CORS
 
-formData：一般传文件用
+CORS（Cross-Origin Resource Sharing）：跨域资源共享，是一种支持来自其它源，访问资源的安全请求以及数据传输的机制，CORS 的发明是为了扩展和增加同源策略Same Origin Policy (SOP) 的灵活性
 
-x-www-form-urlencoded不需要contentType，json需要contentType: 'application/json;charset=UTF-8’，并且json可以有嵌套结构，可以支持更丰富的数据类型
+更具体地说，CORS 是 Web 服务器说“接受来自此来源的跨域请求”或“不接受来自此来源的跨域请求”的一种方式
+
+例如`example.com`使用托管在`fonts.com`上的文本字体。当访问`example.com`时，用户的浏览器会请求`fonts.com`的字体。因为`fonts.com`和`example.com`是两个不同的源，所以这是一个跨域请求。如果`fonts.com`允许跨源资源共享到`example.com`，那么浏览器将继续加载字体。否则，浏览器将取消请求
+
+参考资料：https://supertokens.com/blog/what-is-cross-origin-resource-sharing
+
+## Content-Type Header
+
+`application/x-www-form-urlencoded`：格式是`Name=John+Smith&Age=23`，告诉服务器自己会对查询参数进行`url`编码
+
+`application/json`：格式是`{ "Name": "John Smith", "Age": 23 }`，它的出现是因为`x-www-form-urlencoded`对嵌套对象和数组的编码很麻烦，`json`支持嵌套结构以及更丰富的数据类型
+
+`multipart/form-data`：常用于提交那些包含文件、非ASCII数据、二进制数据的表单，它的出现是由于`x-www-form-urlencoded`对于发送大量二进制数据或包含非ASCII字符的文本时效率过低
+
+用法：一般get请求用`x-www-form-urlencoded`，post请求用`json`，设计到二进制数据例如上传文件时用`form-data`，不绝对，`x-www-form-urlencoded`格式用qs等序列化工具库传嵌套对象或数组也可以，也可以上传文件
+
+简单请求`simple request`：不会触发预检`preflight check`，只允许`application/x-www-form-urlencoded`、`multipart/form-data`和`text/plain`这三种`Content-Type`
+
+预检请求`preflight request`：浏览器发送正式请求前会自动发送OPTIONS请求，检查是否安全，安全才会发送实际请求，`application/json`是预检请求允许的`Content-Type`中的一种
+
+`x-www-form-urlencoded`为什么传二进制效率低：`x-www-form-urlencoded`对每个非字母数字字符`non-alphanumeric characters`（例如逗号加号等符号），都要用'%HH'这种一个百分号加两个表示字符的`ASCII`码的十六进制数去表示它，这就意味着对每一个字节的非字母数字字符，都要用三个字节去表示它，因此对于大型的二进制文件，效率很低
+
+参考资料：https://stackoverflow.com/questions/9870523/what-are-the-differences-between-application-json-and-application-x-www-form-url
+
+参考资料：https://stackoverflow.com/questions/4007969/application-x-www-form-urlencoded-or-multipart-form-data
+
+参考资料：https://www.w3.org/TR/html401/interact/forms.html#h-17.13.4
+
 
 ## 内核、渲染引擎、js引擎
 
