@@ -103,7 +103,7 @@ CORS（Cross-Origin Resource Sharing）：跨域资源共享，是一种支持�
 
 `multipart/form-data`：常用于提交那些包含文件、非ASCII数据、二进制数据的表单，它的出现是由于`x-www-form-urlencoded`对于发送大量二进制数据或包含非ASCII字符的文本时效率过低
 
-用法：一般get请求用`x-www-form-urlencoded`，post请求用`json`，设计到二进制数据例如上传文件时用`form-data`，不绝对，`x-www-form-urlencoded`格式用qs等序列化工具库传嵌套对象或数组也可以，也可以上传文件
+用法：一般get请求用`x-www-form-urlencoded`，post请求用`json`，涉及到二进制数据例如上传文件时用`form-data`，不绝对，`x-www-form-urlencoded`格式用qs等序列化工具库传嵌套对象或数组也可以，也可以上传文件
 
 简单请求`simple request`：不会触发预检`preflight check`，只允许`application/x-www-form-urlencoded`、`multipart/form-data`和`text/plain`这三种`Content-Type`
 
@@ -117,6 +117,23 @@ CORS（Cross-Origin Resource Sharing）：跨域资源共享，是一种支持�
 
 参考资料：https://www.w3.org/TR/html401/interact/forms.html#h-17.13.4
 
+## Lighthouse
+
+教程：https://developer.chrome.com/docs/devtools/lighthouse/
+
+Chrome扩展程序容易干扰，官方建议从隐私模式（无痕模式）打开
+
+几个性能指标
+- First Contentful Paint：内容第一次绘制到屏幕上的时间
+- Time To Interactive：页面已可以处理用户交互的世界
+- Speed Index：加载速度
+- Total Blocking Time：页面被用户输入所阻塞的总时间
+- Largest Contentful Paint：测量最大的内容元素何时呈现到屏幕上
+- Cumulative Layout Shift：累积布局偏移，现有元素的位置改变才叫布局偏移，添加元素到DOM或修改现有元素大小不算，前提是元素的大小变更不会导致其他元素的位置发生改变
+
+怎么查看有没有压缩：打开Network，打开Network settings，勾选Use large request rows，在每个请求的Size中会标有两个值，上面的值是下载资源的大小，下面的值是资源原本大小，如果相同则说明没进行压缩，响应头也会有一个Content-Encoding属性，通常值为gzip、deflate或br
+
+排除阻塞渲染的资源（Eliminate render-blocking resources）：测试资源是否影响加载，More tools => Coverage选项卡 => 点击reload图标，可以看到未使用的部分占比多少，再切到Network request blocking选项卡，添加*/xxx.js，刷新页面，浏览器会自动拦截该资源的请求，如果页面正常加载并且可交互，说明不需要该资源
 
 ## 内核、渲染引擎、js引擎
 

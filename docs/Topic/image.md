@@ -88,5 +88,7 @@ const ImgWithFallback = ({
 />
 ```
 
+图片是如何存储的：https://www.analyticsvidhya.com/blog/2021/03/grayscale-and-rgb-format-for-storing-images/
+
 参考资料：https://themeisle.com/blog/best-image-format/#gref
 参考资料：https://wpmudev.com/blog/best-image-formats-png-vs-jpg-svg-gif-webp/

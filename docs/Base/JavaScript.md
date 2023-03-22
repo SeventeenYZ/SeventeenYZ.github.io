@@ -38,12 +38,11 @@ alert( Number(null) ); // 0
 
 ### script
 
-```js
-<script defer src="example1.js"></script> 
-// 立即下载，但延迟执行,执行顺序是代码写的顺序
-<script async src="example2.js"></script> 
-// 立即下载，但不必等下载和执行完后再加载页面，也不用等该文件下载和执行后再加载其他文件（执行顺序不一定是代码写的顺序），即下载好后立即运行，下载过程不影响其它文件的加载
-```
+async是告诉浏览器解析HTML的同时去异步下载脚本，等下载完成后，解析会被阻止然后去执行脚本，有多个async script时执行顺序不一定是代码写的顺序
+
+defer也是异步下载脚本，区别是等解析完成之后再来执行脚本，有多个defer async时执行顺序是代码写的顺序
+
+![图片加载失败](./assets/async-and-defer.avif)
 
 ## 函数
 

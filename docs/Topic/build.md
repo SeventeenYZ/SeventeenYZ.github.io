@@ -155,50 +155,22 @@ modules.export = {
 }
 ```
 
+现代脚本部署策略（modern script deployment strategy）：使用module/nomodule的特性检测，支持，支持`<script type="module">`的浏览器也支持async/await，class、箭头函数等es6+的功能，同时为不支持这些功能的旧版浏览器提供fallback，做法是生成两套js，一套是es6+，一套是es5
+
+```js
+<script type="module" src="main.mjs"></script>
+<script nomodule src="main.es5.js"></script>
+```
+
+支持ESM的浏览器会加载main.mjs文件，不会加载main.es5.js，而旧版浏览器会加载这个main.es5.js文件
+
+好处：通常ES5版本的文件大小是ES6+版本的两倍还多一点，这样也能节省解析时间
+
+参考资料：https://philipwalton.com/articles/deploying-es2015-code-in-production-today/
+
 ## 缓存
 
 缓存：文件名加入hash，有效时间内用强缓存，缓存失效用协商缓存
-
-## 图片格式
-
-webp格式通常比传统格式（jpg、png）体积小很多
-还有一种更新的图片格式：AVIF
-
-webp在IE和Safari中不支持，为了兼容性，可以写以下代码
-
-```html
-<picture>
-  <source srcset="/images/cereal-box.webp" type="image/webp" />
-  <source srcset="/images/cereal-box.jp2" type="image/jp2" />
-  <img src="/images/cereal-box.jxr" type="image/vnd.ms-photo" />
-</picture>
-```
-
-这表示在大多数浏览器中会使用webp格式，Safari中使用jp2，而IE则使用jxr
-
-还可以封装成公共组件
-
-```tsx
-const ImgWithFallback = ({
-  src,
-  fallback,
-  type = 'image/webp',
-  ...delegated
-}) => {
-  return (
-    <picture>
-      <source srcSet={src} type={type} />
-      <img src={fallback} {...delegated} />
-    </picture>
-  );
-};
-// usage
-<ImgWithFallback
-  src="/images/cereal.webp"
-  fallback="/images/cereal.png"
-  alt="A photo showing the expiration date on a box of Lucky Charms"
-/>
-```
 
 ## 工程化和工具链
 
