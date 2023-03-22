@@ -88,7 +88,11 @@ const ImgWithFallback = ({
 />
 ```
 
-图片是如何存储的：https://www.analyticsvidhya.com/blog/2021/03/grayscale-and-rgb-format-for-storing-images/
-
 参考资料：https://themeisle.com/blog/best-image-format/#gref
 参考资料：https://wpmudev.com/blog/best-image-formats-png-vs-jpg-svg-gif-webp/
+
+图片是如何存储的：https://www.analyticsvidhya.com/blog/2021/03/grayscale-and-rgb-format-for-storing-images/
+
+base64：一种编码算法，能将任何字符转换为由字母、数字、加号和斜杠组成的字母表，可以将汉字、Emoji表情甚至图像转换为"可读"的字符串，可以保存或传输到任何地方。最常用于对二进制数据（例如图像或声音文件）进行编码，输出文本以便嵌入到HTML等文本文档中
+base64参考资料：https://www.redhat.com/sysadmin/base64-encoding
+
