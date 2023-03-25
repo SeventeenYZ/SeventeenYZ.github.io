@@ -107,6 +107,8 @@ export default defineConfig({
         text: '工具',
         items: [
           { text: '画图', link: 'https://excalidraw.com/' },
+          { text: '在线IDE', link: 'https://stackblitz.com/' },
+          { text: '在线接口测试', link: 'https://hoppscotch.io/' },
         ]
       },
       {
