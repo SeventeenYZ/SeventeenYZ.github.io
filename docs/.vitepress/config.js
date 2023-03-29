@@ -84,6 +84,7 @@ export default defineConfig({
           { text: '网道', link: 'https://wangdoc.com/' },
           { text: 'w3schools', link: 'https://www.w3schools.com/' },
           { text: 'eloquent js', link: 'https://eloquentjavascript.net/' },
+          { text: '模式', link: 'https://www.patterns.dev/' }
         ]
       },
       {
@@ -91,6 +92,7 @@ export default defineConfig({
         items: [
           { text: 'joshwcomeau', link: 'https://www.joshwcomeau.com/' },
           { text: 'felixgerschau', link: 'https://felixgerschau.com/' },
+          { text: 'dev', link: 'https://dev.to/' }
         ]
       },
       {
