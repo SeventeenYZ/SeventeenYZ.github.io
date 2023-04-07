@@ -224,7 +224,7 @@ const ref = useRef(0) // ref.current = 0
 
 `function component`里的执行语句，例如`if`等是在渲染过程中执行，渲染过程可以简单看成是`function component`的`function`执行过程，`useEffect`中的是每次渲染完成之后执行，也就是`function`执行之后执行，因此在`useEffect`中`setState`但忘记声明依赖会造成无限循环：渲染完成 => 执行`effect`，触发`setState` => 触发渲染 => 渲染完成 ...
 
-`useEffect`不声明依赖数组和声明空数组的区别：不声明依赖数组会每次渲染`render`都执行，声明空数组是挂载`mounted`时执行，`mounted`只会在初次渲染后触发一次，后续渲染触发的是更新
+`useEffect`不声明依赖数组和声明空数组的区别：不声明依赖数组会每次渲染`render`都执行，声明空数组是挂载`mounted`时执行，`mounted`只会在初次渲染后触发一次，后续update不触发
 
 `useEffect`在`mounted`后和每次`render`后执行，`cleanup`函数在每次`render`前以及`unmonted`后执行，如果两次渲染中依赖项的值不变，那么`effect`函数和`cleanup`函数都会跳过，不执行
 流程是`mounted` => 执行`effect` => 触发重渲染 => 执行`cleanup`函数 => 重渲染完成 => 执行`effect` => 触发重渲染 => .... => `unmounted` => 执行`cleanup`函数 => 结束，具体见：https://react.dev/learn/synchronizing-with-effects#each-render-has-its-own-effects
