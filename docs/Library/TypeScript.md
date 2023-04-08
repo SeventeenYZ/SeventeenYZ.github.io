@@ -58,10 +58,137 @@ function getArea(shape: Shape) {
 
 ## 泛型函数
 
+泛型Generics：使用参数的类型，为了实现类型复用
+
 ```ts
-function firstElement<Type>(arr: Type[]): Type | undefined {
-  return arr[0];
+funticon identity<T>(arg: T): T { return arg }
+
+// 当调用的时候，type system会自动根据传参类型推断返回值类型
+const output = identity('myString') // output是string类型
+```
+
+`<Type>`声明一个类型参数，在输入值和输出值中使用，创建一个关联，可以看成任何类型，`<>`是声明形式，里面值可以用其它名称，如`<Type>`、`<Input>`
+
+### 泛型接口的用法
+
+```ts
+interface GenericIdentityFn<Type> {
+  (arg: Type): Type;
+}
+
+const myIdentity: GenericIdentityFn<number> = identity
+```
+
+### keyof
+
+```ts
+type Point = { x: number, y: number }
+type P = keyof Point // p的类型是"x | y"
+```
+
+和映射类型mapped types搭配会很有用
+
+## typeof
+
+```ts
+let s = 'hello'
+let n: typeof s // 推断出n是string类型
+```
+
+typeof对于基本类型没什么用，一般结合其它类型运算符使用
+
+```ts
+type Predicate = (x: unknown) => boolean
+type K = ReturnType<Predicate> // 推断出K是boolean类型
+```
+
+`ReturnType<T>`是预定义类型predefined type
+
+### typeof的用法
+
+```ts
+function f() { return true }
+type P = ReturnType<typeof f>
+```
+
+上面的`ReturnType`不能直接传f，因为函数f是一个值，值和类型两个不同的东西，`ReturnType`要传类型而不是值
+
+## Index Access Types
+
+### 对象索引
+
+```ts
+type Person = { age: number; name: string; alive: boolean }
+type Age = Person['age'] // 推断出Age是number类型
+type I1 = Person["age" | "name"] // I1 = string | number
+type I2 = Person[keyof Person] // I2 = string | number | boolean
+type AliveOrName = "alive" | "name"
+type I3 = Person[AliveOrName] // I3 = string | boolean
+```
+
+### 数组索引
+
+```ts
+const MyArray = [
+  { name: "Alice", age: 15 },
+  { name: "Bob", age: 23 },
+  { name: "Eve", age: 38 },
+]
+type Person = typeof MyArray[number] // Person = { name: string; age: number }
+type Age = typeof MyArray[number]["age"] // Age = number
+type Age2 = Person["age"] // Age2 = number
+```
+
+## Conditional Types
+
+格式为`SomeType extends OtherType ? TrueType : FalseType`
+
+```ts
+interface Animal {
+  live(): void;
+}
+interface Dog extends Animal {
+  woof(): void;
+}
+type Example1 = Dog extends Animal ? number : string
+// Example1 = number
+ 
+type Example2 = RegExp extends Animal ? number : string;
+// Example2 = string
+```
+
+条件类型的强大之处在于可以和泛型结合使用
+
+```ts
+interface IdLabel {
+  id: number
+}
+interface NameLabel {
+  name: string
+}
+ 
+function createLabel(id: number): IdLabel;
+function createLabel(name: string): NameLabel;
+function createLabel(nameOrId: string | number): IdLabel | NameLabel;
+function createLabel(nameOrId: string | number): IdLabel | NameLabel {
+  throw "unimplemented";
 }
 ```
 
-`<Type>`声明一个类型参数，在输入值和输出值中使用，创建一个关联
+对于两种类型的输入，需要声明三个重载函数，一个用于number，一个用于string，一个包含两者
+
+而用条件类型搭配泛型可以改成以下不需要重载的形式
+
+```ts
+type NameOrId<T extends number | string> = T extends number
+  ? IdLabel
+  : NameLabel
+
+function createLabel<T extends number | string>(idOrName: T): NameOrId<T> {
+  throw "unimplemented";
+}
+
+let a = createLabel("typescript") // a = NameLabel
+let b = createLabel(2.8) // a = IdLabel
+let c = createLabel(Math.random() ? 'hello' : 42) // c = NameLabel | IdLabel
+```
