@@ -1,168 +1,137 @@
-## 浏览器渲染机制
+笔记摘抄自[Inside look at modern web browser](https://developer.chrome.com/blog/inside-browser-part1/)
 
-[chrome渲染机制](https://developer.chrome.com/blog/inside-browser-part1/)
+## 当在地址栏输入一个URL
 
-### 渲染流程
+该篇笔记主要涉及到两个进程，browser进程和renderer进程
 
-1. 解析`html`文件构造`DOM`树（也叫做`content`树）
+browser进程包含了UI线程和network线程
 
-2. 解析`css`文件，和`html`里的`visual instuctions`（应该指的是能展示的标签，即不包括`script`等）构造`render树`
+renderer进程里包含了main线程（也就是执行js的主线程）、worker线程（处理使用web worker或service worker时的js代码）、compositor合成器线程和raster光栅线程，renderer进程的核心工作就是把html、css和js转化成用户可交互的网页
 
-   `DOM`构造：浏览器将接收到的`HTML`代码通过`HTML`解析器解析构建成一颗`DOM`树，同时将接收到的`CSS`代码通过`CSS`解析器构建出样式表规则（`CSSOM`），然后将这些规则分别放到对应的`DOM`树节点上，得到一颗带有样式属性的`DOM`树（`render树`）
+第一步，UI线程会判断这是一个查询还是一个URL
 
-3. `layout`（布局）：浏览器按从上到下，从左到右的顺序读取`DOM`树的`node`，然后开始获取`node`的坐标和大小等`css`属性，把每个`node`定位到对应的坐标
+第二步，UI线程发起一个网络调用（initialte a network call）来获取网站内容，network线程通过合适的协议例如DNS来查找和为请求建立TLS连接
 
-4. `painting`（绘制）：遍历`render`树，用`UI backend layer`把每个`node`绘制出来
+第三步，响应回来之后，如果是一个html文件，则会传递数据给renderer进程。如果是一个zip文件或其它类型文件，说明是一个下载请求，这时候则会把数据传递给下载管理器download manager
 
-### 布局和回流
+注：在传递数据之前，network线程也会询问响应数据是否安全，此时浏览器会进行SafeBrowsing校验，如果域名和响应数据匹配到了已知的恶意站点，network线程会展示一个警告页，另外还会进行CORB（Cross Origin Read Blocking）校验，为了保证敏感的跨域数据不会被传递给rendered进程
 
-一个意思，`Webkit rendering engine`把将元素放置在屏幕的某个位置的操作叫做`layout`，而在`Gecko rendering endgine`中叫做`Reflow`（回流）
+第四步，当所有校验都完成，network线程才能确定此时可以让浏览器导航到所请求的站点，于是network线程通知UI线程需要的数据已经准备完毕，UI线程就会寻找一个renderer进程来做页面渲染工作
 
-## 浏览器缓存
+注：由于网络请求通常需要几百毫秒才响应完成，浏览器会采取一种优化方法来加快这个过程。当UI线程在第二步时发送一个URL请求给network线程，它已经知道它们将会导航到哪个网站，UI线程尝试并行地主动查找或启动一个renderer进程，这样做的话，如果一切进行顺利，那么renderer进程会在network线程接收数据时就已经准备好了
 
-![图片加载失败](./assets/request.png)
+第五步，现在数据和renderer进程已经都准备好了，browser进程会发送IPC和数据流data stream给renderer process去commit navigation。等browser进程确认renderer进程完成commit，那么导航就结束了，此时进入文档加载阶段（the navigation is complete and the document loading phase begins），也就是renderer进程拿着数据准备渲染页面了
 
-强制缓存有三种情况：
+第六步，当renderer进程渲染页面完毕，发送IPC告知browser进程（此时页面上所有的onload事件的回调函数都已经执行完成）
 
-不存在缓存结果和标识，则说明强制缓存失效或不存在，直接向服务器发起请求
+## 解析HTML
 
-存在缓存结果和标识，但结果失效，携带标识发起请求（协商缓存）
+### 构建DOM
 
-存在缓存结果和标识，未失效，则直接应用缓存
+当renderer进程接收到commit navigation信息并且开始接收html数据时，main线程开始解析html文档并构建DOM tree
 
-### 强制缓存的缓存规则
+### 子资源加载
 
-控制强制缓存的字段是响应头中的`Expires`和`Cache-Control`，后者优先级更高
+在main线程解析到DOM的过程遇到需要加载其它资源如images、css和js时，main线程会通知browser进程里的network线程去请求
 
-`Expires`：http1.0时控制缓存的字段，原理是使用客户端时间与服务端返回的时间做对比，但是客户端和服务端时间可能有误差（例如时区不同），如果客户端时间晚于服务端则资源还未过期就重新请求，反之则资源过期了客户端还在使用，在http1.1被`Cache-Control`取代
+### js会阻塞解析
 
-`Cache-Control`取值主要为
+当html解析器解析到script标签时，会暂停解析，接着去加载、解析和执行js代码，之后再继续解析html文档。原因是js有可能会改变文档结构，例如document.write()。可以使用async或defer来不阻塞html的解析
 
-- public：所有内容都被缓存（客户端和代理服务器都可缓存）
-- private：所有内容只有客户端缓存，默认值
-- no-cache：客户端缓存内容，但是是协商缓存
-- no-store：所有内容都不缓存，每次都请求新的
-- max-age=xxx：缓存内容在xxx秒后失效
+## 样式计算
 
-强制缓存顺序是先内存（from memory cache）后硬盘（from disk cache），内存缓存读取速度快，进程关闭时清空
+main线程解析css并且计算出每个DOM节点的样式
 
-刷新时、无痕模式是内存缓存，退出重进、大型css、js文件是硬盘缓存，
+## 布局
 
-### 协商缓存
+renderer进程此时知道了文档结构和每个节点的样式还不足以渲染页面，就像只描述一幅画里有一个大的红色圆圈和一个小的蓝色正方形，并不足以让别人知道这幅画究竟长什么样子
 
-![图片加载失败](./assets/negotiate-caching-success.png)
+布局layout是一个用来确定元素几何形状和位置的过程，main线程遍历DOM和计算后的样式然后生成一个layout tree，layout tree包含着元素的坐标，盒子边界大小等信息。layout tree和DOM tree结构很相似，但layout tree的节点只包含了有关在页面上怎么显示的信息，如果元素设置为display: none，那这个元素不会出现在layout tree上
 
-![图片加载失败](./assets/negotiate-caching-fail.png)
+## 绘制
 
-协商缓存的标识有`Last-Modified/If-Modified-Since`和`Etag/If-None-Match`，后者优先级更高
+有了DOM、样式和布局依然还不能够渲染页面，例如想复制一幅画，知道了尺寸、形状和元素位置，但是仍然无法判断它们的绘制顺序。例如两个位置有重叠而且设置了`z-index`的元素，那么就需要确定它们的绘制顺序。在绘制步骤，main线程遍历layout tree来创建绘制记录paint records，绘制记录是一个绘制过程的注释，例如先背景，然后文本，然后矩形
 
-`Last-Modified`：响应头字段，表示返回该资源最后被修改的时间
-`If-Modified-Since`：请求头字段，服务器用来与最后被修改时间对比，一致则返回304，同意缓存，不一致则重新返回资源，状态码为200
+### update rendering pipeline is costly
 
-`Etag`：响应头字段，服务器对该资源的唯一标识
-`If-None-Match`：请求头字段，服务器用来与自己保存的`Etag`值作对比
+![图片加载失败](./assets/rendering-pipeline.png)
 
-## 本地存储
+如果设置动画让一个元素动起来，浏览器必须在每一帧都执行这些渲染操作（style - layout - paint）
 
-`Local Storage`：保存的数据没有过期时间，需要手动删除，存储空间5M
+![图片加载失败](./assets/00ad71df326d5d4f7fb299f3d528c78.png)
 
-`Session Storage`：保存的数据在页面关闭后会被删除，存储空间5M
+在60帧刷新率的屏幕上，如果某几个帧缺失了渲染操作，这就是丢帧，用户看着会页面卡顿
 
-`Cookies`：过期时间自己设置，安全性不高，容易被拦截，存储空间4k
+而这些渲染操作是在主线程上运行的，这意味着当应用程序正在执行js的时候它可能会被阻塞
 
-相同点：都是保存在客户端，且同源共享
+![图片加载失败](./assets/44310eabe95c644412b5efb418dc5ac.png)
 
-不同点：`Cookies`数据由服务端设置，参与通信；`Session Storage`和`Local Storage`由客户端设置，不参与通信
+这种情况可以将对js的操作分割为小的块chunks，通过`requestAnimationFrame()`在每个帧上执行
 
-`Cookies`属性：
-① `Domain`：域，表示请求的`url`符合这个格式的请求时才会带上这个`cookie`
-② `Path`：路径前缀，符合这个路径的请求`url`才会带上
-③ `Secure`：为true时表示使用`https`协议才发送这个`cookie`
-④ `HttpOnly`：为true时表示无法通过`js`脚本读取到这个`cookie`，防止`XSS`攻击
-⑤ `Expires/Max-Age`：过期时间
+![图片加载失败](./assets/e795b6e995cc561b15c54d11998a623.png)
 
-为什么有了`token`还需要`cookie`：例如通过`<a>`标签或`location.href`来下载文件，`HTTP`请求是浏览器发送的而不是`JS`，除了使用`XMLHttpRequest`和`fetch`发出的请求之外，页面无法自定义`HTTP`请求头"Authorization"来发送`token`，而用`url`发送`token`不安全，`token`暴露在`url`，会记录在浏览器历史记录、访问日志等，因此需要`cookie`
+## 合成
 
-## 跨域
+此时浏览器知道文档结构、每个元素的样式、页面的几何形状位置和绘制顺序，浏览器要开始绘制页面了，将这些信息转变成像素展示在屏幕上的过程叫做光栅化rasterizing
 
-### CORS
+在Chrome首次发布时，处理光栅化是只简单地将页面里用户看得到的部分光栅化，用户滚动页面，再继续光栅化填充新的部分。而现代浏览器用一种更复杂的过程称之为合成compositing
 
-CORS（Cross-Origin Resource Sharing）：跨域资源共享，是一种支持来自其它源，访问资源的安全请求以及数据传输的机制，CORS 的发明是为了扩展和增加同源策略Same Origin Policy (SOP) 的灵活性
+合成是一种用一个叫compositor线程的独立线程，将页面分成若干个图层，分别去对它们进行光栅化，然后再组合成一个页面的技术，当用户滚动页面时，由于图层都已经光栅化，所要做的只是合成一个新的帧。动画可以用同样的方式通过移动图层和合成一个新的帧来实现
 
-更具体地说，CORS 是 Web 服务器说“接受来自此来源的跨域请求”或“不接受来自此来源的跨域请求”的一种方式
+### 页面分割成图层
 
-例如`example.com`使用托管在`fonts.com`上的文本字体。当访问`example.com`时，用户的浏览器会请求`fonts.com`的字体。因为`fonts.com`和`example.com`是两个不同的源，所以这是一个跨域请求。如果`fonts.com`允许跨源资源共享到`example.com`，那么浏览器将继续加载字体。否则，浏览器将取消请求
+为了找出哪些元素应该在哪些图层中，主线程main thread遍历layout tree来生成一个layer tree
 
-参考资料：https://supertokens.com/blog/what-is-cross-origin-resource-sharing
+### 主线程的光栅和合成
 
-## Content-Type Header
+一旦layer tree创建完成并且绘制顺序确定了，主线程commit信息给compositor线程，compositor线程接着对每个层进行光栅化，一个图层可能是一整个页面这么大，所以compositor线程将它们切分成瓦片tiles然后发送给raster光栅器线程，raster线程对每个瓦片tile进行光栅化然后保存到GPU内存里
 
-`application/x-www-form-urlencoded`：格式是`Name=John+Smith&Age=23`，告诉服务器自己会对查询参数进行`url`编码
+等所有瓦片tiles都光栅化完毕，compositor线程就收集瓦片tile信息（称为draw quads）来创建一个合成帧compositor frame
 
-`application/json`：格式是`{ "Name": "John Smith", "Age": 23 }`，它的出现是因为`x-www-form-urlencoded`对嵌套对象和数组的编码很麻烦，`json`支持嵌套结构以及更丰富的数据类型
+tile：就像一个个小的矩形卡片，最后组合起来就是一个完整的图层
 
-`multipart/form-data`：常用于提交那些包含文件、非ASCII数据、二进制数据的表单，它的出现是由于`x-www-form-urlencoded`对于发送大量二进制数据或包含非ASCII字符的文本时效率过低
+draw quads：包含了tile的一些信息，例如瓦片tile在内存中的位置以及考虑到在页面合成过程中在页面哪个位置去画这个瓦片tile
 
-用法：一般get请求用`x-www-form-urlencoded`，post请求用`json`，涉及到二进制数据例如上传文件时用`form-data`，不绝对，`x-www-form-urlencoded`格式用qs等序列化工具库传嵌套对象或数组也可以，也可以上传文件
+compositor frame：收集draw quads，然后用来表示页面的一帧
 
-简单请求`simple request`：不会触发预检`preflight check`，只允许`application/x-www-form-urlencoded`、`multipart/form-data`和`text/plain`这三种`Content-Type`
+一个合成帧compositor frame接着通过IPC提交给browser进程，此时，可以从UI线程中添加另一个合成帧以进行浏览器UI更改。这些合成帧被发送到GPU然后显示在屏幕上。如果出现滚动事件，compositor线程将创建另一个要发送到GPU的合成帧compositor frame
 
-预检请求`preflight request`：浏览器发送正式请求前会自动发送OPTIONS请求，检查是否安全，安全才会发送实际请求，`application/json`是预检请求允许的`Content-Type`中的一种
+合成的好处是它可以在不影响到main线程的条件下完成，compositor线程是一个独立的线程，而且它不需要等待样式计算或者js执行，这就是为什么composition only animations被认为是兼具顺滑和性能的最佳选择，如果layout或者paint需要重新计算，那么必然会涉及到主线程
 
-`x-www-form-urlencoded`为什么传二进制效率低：`x-www-form-urlencoded`对每个非字母数字字符`non-alphanumeric characters`（例如逗号加号等符号），都要用'%HH'这种一个百分号加两个表示字符的`ASCII`码的十六进制数去表示它，这就意味着对每一个字节的非字母数字字符，都要用三个字节去表示它，因此对于大型的二进制文件，效率很低
+## input event
 
-参考资料：https://stackoverflow.com/questions/9870523/what-are-the-differences-between-application-json-and-application-x-www-form-url
+input event输入事件不仅是在输入框里输入文字或者鼠标的点击，在浏览器的视角看来，输入意味着用户的任何手势，鼠标滚动、触摸、鼠标移动都是输入事件
 
-参考资料：https://stackoverflow.com/questions/4007969/application-x-www-form-urlencoded-or-multipart-form-data
+举个例子，当用户触摸屏幕时，最先接收到这一手势的是browser进程，browser进程只关心发生在renderer进程所渲染的内容里的手势，browser进程会将发生事件类型（例如touchstart）和它的坐标给renderer进程，renderer进程通过寻找事件的目标元素（event target）和执行绑定的事件监听器（event listeners）来处理这个事件
 
-参考资料：https://www.w3.org/TR/html401/interact/forms.html#h-17.13.4
+### compositor如何接收input event
 
-## Lighthouse
+compositor合成器是通过合成光栅化的图层来让页面滚动时保持顺滑。当没有绑定输入事件监听器的时候，compositor线程可以完全独立于main thread创建一个新的合成帧，而当有绑定输入事件监听器的话，compositor thread如何知道事件是否需要处理
 
-教程：https://developer.chrome.com/docs/devtools/lighthouse/
+### 理解non-fast srollable region
 
-Chrome扩展程序容易干扰，官方建议从隐私模式（无痕模式）打开
+由于执行js是main线程的工作，当页面合成完成后，compositor线程会标记页面里某个绑定了事件监听器的区域作为“non-fast scrollable region”。有了这个标记，当区域里的事件触发后，compositor线程就可以确定是否要发送输入事件给main线程，而如果input event是发生在这个区域之外，那么compositor线程就可以在不用等待main线程的情况下继续合成新的帧
 
-几个性能指标
-- First Contentful Paint：内容第一次绘制到屏幕上的时间
-- Time To Interactive：页面已可以处理用户交互的世界
-- Speed Index：加载速度
-- Total Blocking Time：页面被用户输入所阻塞的总时间
-- Largest Contentful Paint：测量最大的内容元素何时呈现到屏幕上
-- Cumulative Layout Shift：累积布局偏移，现有元素的位置改变才叫布局偏移，添加元素到DOM或修改现有元素大小不算，前提是元素的大小变更不会导致其他元素的位置发生改变
+当写event handles的时候要注意，当你采用事件委托，并且委托元素是body元素，在浏览器的角度看来，这意味着整个页面都是non-fast scrollable region，每当输入事件到来，compositor thread都要去和main thread进行沟通然后等待它，这会破坏合成器对于平滑滚动的处理能力
 
-怎么查看有没有压缩：打开Network，打开Network settings，勾选Use large request rows，在每个请求的Size中会标有两个值，上面的值是下载资源的大小，下面的值是资源原本大小，如果相同则说明没进行压缩，响应头也会有一个Content-Encoding属性，通常值为gzip、deflate或br
+为了减少这种情况的发生，可以在事件监听器上添加passive: true选项，这是提示浏览器在main线程中仍然可以监听事件，但是合成器也可以接着合成新的帧
 
-排除阻塞渲染的资源（Eliminate render-blocking resources）：测试资源是否影响加载，More tools => Coverage选项卡 => 点击reload图标，可以看到未使用的部分占比多少，再切到Network request blocking选项卡，添加*/xxx.js，刷新页面，浏览器会自动拦截该资源的请求，如果页面正常加载并且可交互，说明不需要该资源
+### 找到事件目标元素event target
 
-断点调试：路径是Sources => File Navigator => Page，"域名加端口"的文件名是打包后的，找到文件名与项目名相同的，里面的ts或tsx文件是没打包之前的，在那里面打断点。Scope可以查看当前变量的值，Watch可以插入表达式执行，表达式中可以访问到变量
+当compositor线程发送一个input event给main线程时，首先是执行一个hit test（命中测试）来找到event target，hit tests使用在rendering进程里生成的paint records来找出事件触发时所在坐标下的内容
 
-## 内核、渲染引擎、js引擎
+### minimizing event dispatches to the main thread
 
-内核包括渲染引擎、`js`引擎和其它组件，虽然我们现在习惯单独称呼`js`引擎，但在内核架构图里，`js`引擎始终是包含在内核里的，只不过可以单独拎出来，因为它和内核之间不是集成关系，而是调用关系，所以如果魔改内核的话可以替换成其它`js`引擎
+将需要派发到主线程的事件最小化，通常屏幕一秒刷新60次，在触屏设备上触摸事件的刷新率是一秒60-120次，鼠标刷新率是100次，输入事件频率比屏幕刷新率更高
 
-## 关于app内核的讨论
+如果一个持续性事件continuous events例如touchmove一秒发送给主线程120次，这会触发过多的hit tests，并且和屏幕刷新率相比，js执行会有多慢
 
-app自带内核的好处：当初微信团队是主动找到X5内核的。原因是安全和可控。安全的原因是如果微信使用系统内核，一旦爆出安卓、chromium的漏洞，将非常被动。很难甚至无法修复。而且如果不是X5统一了标准（虽然之前落后了点），你们要所有机型一个个的适配，甚至包括安卓4.4以前的`webview`。这个工作量远比适配X5高N倍
+为了减少对主线程的频繁调用，Chrome会在下一个requestAnimationFrame到来之前，将持续性事件continuous events进行聚合然后延迟派发
 
-知乎有条回答：微信6.1版本以上的android用户，都是使用的QQ浏览器的X5内核。5.4-6.1之间的版本，若用户安装了QQ浏览器就是使用的X5内核，若用户未安装浏览器，使用的是系统内核。系统没有qq浏览器就用系统的浏览器，有 qq 浏览器会用 qq 浏览器的内核（但评论里也有人反馈高版本微信依然使用的是系统内核的情况）
+![图片加载失败](./assets/26dc39eb72a4f3212353cc1c2da91dd.png)
 
-还有人回答：在高版本的安卓系统上新版本的微信，之前看过好像也是基于WebView的（当时是看的安卓10）。x5现在只用在兼容低版本系统这个场景
+如果需要中途不丢失坐标信息，例如想画一条线，可以用`getCoalescedEvents()`
 
-自测手机系统android system webview版本是87，自带浏览器打开https://ie.icoa.cn/网站检测是89，微信浏览器打开是86，说明自带浏览器和微信都是用它们app自带的内核
+![图片加载失败](./assets/04122244e4097301d9bb9c85bc809c8.png)
 
-还有一种检测办法，打开http://soft.imtt.qq.com/browser/tes/feedback.html，显示000000表示加载的是系统内核，显示大于0的数字表示加载了x5内核（数字是x5内核版本号）
-
-## app自带内核和系统WebView
-
-遇到过一个问题：遇到一个跑在企微端的H5项目在Android 9手机上白屏，app版本已经是最新，排查半天是系统内置`WebView`版本过低，只有68，升级系统`WebView`后才解决
-
-原因：企微自带了x5内核，可能是默认禁用掉了app自带内核才会调用系统内置`Webview`来进行渲染加载（google play商店版本的微信默认就是使用系统`WebView`内核，这也是很多人觉得觉得 Play 商店版本的微信体验会比国内版本的微信好的原因之一）
-
-X5 WebView 内核是在APP 第一次初始化时，动态下载到APP 的内部存储空间，因为TBS SDK(Android x5 webview)采用了后台动态下发内核的方案。由于Google Play 禁止任何二进制代码的下发（包括so、dex、jar）和插件化技术的使用，故使用X5 内核的app不支持在海外Google Play上架新版本微信已经从x5内核切换到xweb内核，可以通过`Navigator.userAgent.toLowerCase().includes('xweb')换成xweb`，旧版X5内核是`includes('tbs')`
-
-组里也有人说现在企微自带的x5内核是直接在系统自带`WebView`简单封装了一下（为了减小app体积），运行的时候是调用系统`WebView`在渲染执行，所以系统`WebView`版本低会导致白屏（此条存疑）
-
-## 小程序内核
-
-小程序内核其实就是微信内置的内核，安卓端的还是X5内核，它是基于chromium（blink和v8）的腾讯魔改版，小程序官网不写x5，写的是chromium
+而离散型事件discrete events例如keydown，keyup，mouseup，mousedown，touchstart和touchend则会立即派发

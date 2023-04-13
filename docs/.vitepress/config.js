@@ -41,7 +41,7 @@ export default defineConfig({
           { text: '网络', link: '/Topic/network' },
           { text: '规范', link: '/Topic/style'},
           { text: '构建', link: '/Topic/build'},
-          { text: '浏览器', link: '/Topic/browser'},
+          { text: '浏览器渲染机制', link: '/Topic/browser'},
           { text: '图片', link: '/Topic/image'},
           { text: '计算机', link: '/Topic/computer'},
         ]
@@ -65,6 +65,7 @@ export default defineConfig({
           { text: '后端概念', link: '/Tool/backend'},
           { text: '部署流程', link: '/Tool/deploy'},
           { text: '数据库', link: '/Tool/SQL'},
+          { text: '浏览器', link: '/Tool/browser'},
         ]
       },
       {
