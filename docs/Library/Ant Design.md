@@ -445,3 +445,45 @@ useEffect(() => {
 }, [])
 ```
 
+## Antd版本4.x使用day.js替换Moment.js
+
+官网示例
+
+```tsx
+import { Dayjs } from 'dayjs';
+import dayjsGenerateConfig from 'rc-picker/es/generate/dayjs';
+import generatePicker from 'antd/es/date-picker/generatePicker';
+
+const DatePicker = generatePicker<Dayjs>(dayjsGenerateConfig);
+
+export default DatePicker;
+```
+
+存在问题：部分中文显示变成英文了
+
+改进
+
+```tsx
+import React from 'react';
+import { Dayjs } from 'dayjs'
+import dayjsGenerateConfig from 'rc-picker/lib/generate/dayjs'
+import generatePicker from 'antd/es/date-picker/generatePicker'
+import 'antd/es/date-picker/style/index'
+import 'dayjs/locale/zh-cn'
+import locale from 'antd/es/date-picker/locale/zh_CN'
+
+const DatePickerConfig = generatePicker<Dayjs>(dayjsGenerateConfig)
+
+const DatePicker = (props: any) => {
+    return <DatePickerConfig locale={locale} {...props} />
+}
+
+const { RangePicker } = DatePickerConfig // 增加RangePicker
+
+export const RangePickerDayjs = (props: any) => {
+    return <RangePicker locale={locale} {...props} />
+}
+
+export default DatePicker
+```
+

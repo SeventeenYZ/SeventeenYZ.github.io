@@ -418,3 +418,65 @@ position: -webkit-sticky; // 添加前缀
 参考资料：https://medium.com/frontend-canteen/if-the-backend-api-returns-100-000-records-at-one-time-how-should-we-handle-it-in-the-frontend-fab21218fe2
 
 补充：在几百条数据的情况下，虚拟列表与真实Dom的渲染速率毫无差别，一般所说的长列表，是几千几万条数据的情况下
+
+## 设置入口页的必要性
+
+在所有页面的入口页，如`App.tsx`或自定义一个入口页，从入口页开始渲染菜单或导航、路由组件等，在入口页中做获取用户信息、判断权限、赋值权限路由、权限菜单等的操作
+
+应用场景1：为了让用户刷新页面可以重新执行一次入口页逻辑，无入口页的情况下如果是在某个页面获取用户信息，再跳到其它页面，点击刷新会导致vuex里的用户信息数据不见了，当然有个取巧的办法是这些数据只用storage存储或同步到storage
+
+应用场景2：用户有时是点外部链接是直接进到某个页，不是经过正常打开进入首页后再点击菜单跳转，此时没有入口页的话要单独为这个页设置获取用户信息的接口，如果提供了多个外部链接，每个页面都要做一样的获取用户信息、权限判断，会显得多余
+
+应用场景3：入口页相当于把权限判断等逻辑在全局层面上做了，具体页不需要判断是否有权限或用户id是否存在等逻辑，能进来具体页说明这些校验都已经通过了，而且可以直接访问接口已返回的用户信息，专心写具体业务逻辑。如果是入口页不等判断完权限就渲染其它页，在具体页不知道入口页的用户信息获取完了没有，需要多写其它复杂逻辑
+
+```tsx
+const render = () => {
+  const rootElement = document.getElementById('app');
+  const App: React.FC = () => {
+    const dispatch = useDispatch();
+    const history = useHistory();
+    const [appRoutes, setAppRoutes] = useState<any[]>([]);
+
+    const getUserInfo = async () => {
+      const { payload } = await dispatch(fetchUser());
+      if (!payload.is_admin && !payload.id) {
+        history.push('/noAuthority');
+        return;
+      }
+      setAppRoutes(routes as any[]);
+    }
+
+    useEffect(() => {
+      getUserInfo();
+    }, [])
+
+    return (
+      <Router>
+        <Switch>
+          {appRoutes.map((route) => (
+            <CPRouteWithSubRoutes key={route.path} {...route} />
+          ))}
+          <Route path='*'>
+            <CPNoMatch />
+          </Route>
+        </Switch>
+      </Router>
+    )
+  }
+
+  ReactDOM.render(<Provider store={store}><App /></Provider>, rootElement);
+};
+```
+
+## 金额格式化
+
+四舍五入并隔三位插入逗号
+
+```ts
+export const currencyFormatter = new Intl.NumberFormat('zh-CN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+});
+currencyFormatter.format(amount)
+```
+

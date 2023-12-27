@@ -238,3 +238,62 @@ const Index = () => {
 }
 ```
 
+### 与react-query搭配的路由传参
+
+react-router v5，react-query
+
+需求：从A页点击列表的查看详情跳转到B页，将B页表单的房间号设置为A页传过来的参数后查询列表
+
+react-router传参方式有三种，params和search都是需要在路由上写明的，因此选用第三种state传值，逻辑如下
+
+A页面，传值添加一个当前时间time作为B页的判断逻辑
+
+```ts
+const viewDetail = (record) => {
+    history.push({
+      pathname: ‘/xxx’,
+      search: `?token=${getToken()}`,
+      state: { room_no: record.room_no, time: new Date().getTime() }
+    })
+ }
+```
+
+B页面，列表传参payload，useTableData封装列表接口
+
+```tsx
+const { state, pathname, search } = useLocation();
+const history = useHistory();
+const [searchForm] = Form.useForm();
+const [formValues, setFormValues] = useState({});
+
+const payload = useMemo(function() {
+	const payload = {}
+	if (state?.time && state?.room_no) {
+		searchForm.setFieldValue('room_no', state.room_no)
+		payload.room_no = state.room_no
+		// 将state置空，用history.replace不会触发useTableData，导致跳转过来后调两次列表的bug
+		history.replace({ pathname, search, state: {} })
+	}
+    ... // 其它参数 
+    return payload
+}, [pageIndex, pageSize, formValues, formValues, state?.time]) // 添加state?.time作为依赖
+const { data, refetch } = useTableData(payload);
+
+ const onSearch = useCallback(function () {
+      setFormValues(searchForm.getFieldsValue());
+      setPageIndex(1);
+ }, [searchForm]);
+
+const onReset = useCallback(function () {
+      searchForm.resetFields();
+      onSearch();
+}, [searchForm, onSearch]);
+
+return (
+<>
+    <Form form={searchForm}>
+        ...
+    </Form>
+</>)
+```
+

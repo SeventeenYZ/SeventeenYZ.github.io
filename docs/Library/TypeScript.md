@@ -192,3 +192,16 @@ let a = createLabel("typescript") // a = NameLabel
 let b = createLabel(2.8) // a = IdLabel
 let c = createLabel(Math.random() ? 'hello' : 42) // c = NameLabel | IdLabel
 ```
+
+## 使用技巧
+
+从一个interface中提取某几个属性，并保持相同的属性可选，Pick选取的可选属性会变成非可选属性
+```ts
+type test1 = {
+    a: string
+    b?: string
+    c: string
+}
+type OptionalPick<T, K extends PropertyKey> = Pick<T, Extract<keyof T, K>>
+type test2 = OptionalPick<test1, 'a' | 'b' | 'c'>
+```

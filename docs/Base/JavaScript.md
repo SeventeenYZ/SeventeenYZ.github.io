@@ -285,6 +285,41 @@ dog1.run(); // 狗会跑 // dog1没有定义run方法，它的run方法是从原
 
 实例对象虽然是构造函数创造出来的，但是它们之间并没有直接引用，实例实例之所以能用constructor属性访问到构造函数是因为这个属性是从它的原型对象继承来的
 
+`class`使得可以同时声明构造函数`Constructor`提供的属性和原型对象`Prototype`提供的方法，本质是一个特殊的构造函数
+
+```js
+// 构造函数，用于给实例对象添加属性
+function Pen(name, color, price) {
+    this.name = name;
+    this.color = color;
+    this.price = price;
+}
+// Pen.prototype是原型对象，用于给实例函数添加方法
+Pen.prototype.showPrice = function() {
+    console.log(`Price of ${this.name} is ${this.price}`)
+}
+// pen1拥有特定属性name、color、price和共享方法showPrice
+const pen1 = new Pen('maker', 'blue', '3')
+```
+
+用`class`语法实现，代码更加干净
+
+```js
+class Pen {
+    constructor(name, color, price) {
+        this.name = name
+        this.color = color
+        this.price = price
+    }
+    
+    showPrice() {
+        console.log(`Price of ${this.name} is ${this.price}`)
+    }
+}
+
+const pen1 = new Pen('marker', 'blue', '3')
+```
+
 ## 异步
 
 `ES6`之前的异步编程方案：
