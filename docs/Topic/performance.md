@@ -52,7 +52,7 @@ BTF Images是那些在页面加载时不会立刻对用户可见的图片，这�
 
 ### 1P JS
 
-inline scripts：在加载的HTML页面内<script>标签中编写的脚本
+inline scripts：在加载的HTML页面内`<script>`标签中编写的脚本
 
 First-party scripts：简称1P JS，包含在.js文件中，并且和HTML页面是同一域名的脚本
 
@@ -62,13 +62,13 @@ Third-party script：简称3P JS，包含在.js文件但位于另一个域的脚
 
 ### 3P JS
 
-在HTML中的3P同步脚本会阻塞CSS和字体的解析从而影响FCP，在<head>的同步脚本也会影响HTML body的解析，3P JS在主线程上的执行会延迟1P JS的执行、push out hydration（大概意思是推迟了页面交互性的激活）和FID。因此，控制3P JS的加载的有必要的
+在HTML中的3P同步脚本会阻塞CSS和字体的解析从而影响FCP，在`<head>`的同步脚本也会影响HTML body的解析，3P JS在主线程上的执行会延迟1P JS的执行、push out hydration（大概意思是推迟了页面交互性的激活）和FID。因此，控制3P JS的加载的有必要的
 
 ### 加载优先级
 
 CSS和字体一般是最高优先级加载
 
-scripts根据它们在文档的位置以及是否是async、defer或者blocking优先级不同，如果blocking scripts（即<script>标签）在<img>之前，那么它比这个标签所引用的图片有更高的优先级，如果是在之后，则优先级比图片低。而async/defer/injected（外部导入.js文件）的scripts，不管它们在document中的位置如何，都是最低优先级，因此可以为一些<script>添加async或者defer来降低它们的优先级
+scripts根据它们在文档的位置以及是否是async、defer或者blocking优先级不同，如果blocking scripts（即`<script>`标签）在`<img>`之前，那么它比这个标签所引用的图片有更高的优先级，如果是在之后，则优先级比图片低。而async/defer/injected（外部导入.js文件）的scripts，不管它们在document中的位置如何，都是最低优先级，因此可以为一些`<script>`添加async或者defer来降低它们的优先级
 
 ATF图片比BTF图片有更高优先级
 

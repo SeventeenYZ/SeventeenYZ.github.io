@@ -44,6 +44,7 @@ export default defineConfig({
           { text: '浏览器渲染机制', link: '/Topic/browser'},
           { text: '图片', link: '/Topic/image'},
           { text: '计算机', link: '/Topic/computer'},
+          { text: '性能', link: '/Topic/performance'},
         ]
       },
       {
