@@ -160,6 +160,23 @@ axios.interceptors.response.use(
 )
 ```
 
+## Axios切换tab取消前一个请求
+
+```tsx
+// testPage.tsx
+let axiosSource = undefined as CancelTokenSource
+export const testPage = () => {
+    const getList = async () => {
+        if (axiosSource) {
+            axiosSource.cancel() // 切换tab会触发第二次getList函数，这时候进行取消，上一个如果还没返回响应就能够成功取消
+        }
+        axiosSource = axios.CancelToken.source() // 要重新赋值，这样能生成新的token，恢复当前tab的列表请求
+        const params = { tabValue, ... }
+        const [err, data] = await GET_TEST_LIST(params, axiosSource.token)
+    }
+}
+```
+
 ## 等某个接口完成后再进行其它逻辑
 
 需求背景：在做了权限管理的系统中，要等调用权限接口获取到权限码数组后，匹配当前菜单页的权限码是否在权限码数组中，不在说明没有权限不予展示
